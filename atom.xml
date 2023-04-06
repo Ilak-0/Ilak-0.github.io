@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Ilak</title>
+  
+  <subtitle>于山海间，遇见</subtitle>
+  <link href="http://www.ilak.website/atom.xml" rel="self"/>
+  
+  <link href="http://www.ilak.website/"/>
+  <updated>2023-04-06T02:04:01.357Z</updated>
+  <id>http://www.ilak.website/</id>
+  
+  <author>
+    <name>Ilak</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="http://www.ilak.website/2023/04/06/hello-world/"/>
+    <id>http://www.ilak.website/2023/04/06/hello-world/</id>
+    <published>2023-04-06T02:04:01.357Z</published>
+    <updated>2023-04-06T02:04:01.357Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot;&gt;documentation&lt;/a&gt;</summary>
+        
+      
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>记一次consul迁移</title>
+    <link href="http://www.ilak.website/2023/04/04/consul%E8%BF%81%E7%A7%BB/"/>
+    <id>http://www.ilak.website/2023/04/04/consul%E8%BF%81%E7%A7%BB/</id>
+    <published>2023-04-03T16:31:17.000Z</published>
+    <updated>2023-04-06T02:04:01.356Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;background&quot;&gt;&lt;a href=&quot;#background&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>四小时睡眠后的一天</title>
+    <link href="http://www.ilak.website/2023/03/29/%E5%9B%9B%E5%B0%8F%E6%97%B6%E7%9D%A1%E7%9C%A0%E5%90%8E%E7%9A%84%E4%B8%80%E5%A4%A9/"/>
+    <id>http://www.ilak.website/2023/03/29/%E5%9B%9B%E5%B0%8F%E6%97%B6%E7%9D%A1%E7%9C%A0%E5%90%8E%E7%9A%84%E4%B8%80%E5%A4%A9/</id>
+    <published>2023-03-29T14:56:52.000Z</published>
+    <updated>2023-04-06T02:04:01.358Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;除了困还是困&quot;&gt;&lt;a href=&quot;#除了困还是困&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    
+  </entry>
+  
+</feed>
