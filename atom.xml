@@ -6,7 +6,7 @@
   <link href="http://www.ilak.website/atom.xml" rel="self"/>
   
   <link href="http://www.ilak.website/"/>
-  <updated>2023-04-06T02:04:01.357Z</updated>
+  <updated>2023-04-06T02:04:01.356Z</updated>
   <id>http://www.ilak.website/</id>
   
   <author>
@@ -15,27 +15,6 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="http://www.ilak.website/2023/04/06/hello-world/"/>
-    <id>http://www.ilak.website/2023/04/06/hello-world/</id>
-    <published>2023-04-06T02:04:01.357Z</published>
-    <updated>2023-04-06T02:04:01.357Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot;&gt;documentation&lt;/a&gt;</summary>
-        
-      
-    
-    
-    
-    
-  </entry>
   
   <entry>
     <title>记一次consul迁移</title>
