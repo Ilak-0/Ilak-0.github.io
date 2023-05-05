@@ -6,7 +6,7 @@
   <link href="http://www.ilak.website/atom.xml" rel="self"/>
   
   <link href="http://www.ilak.website/"/>
-  <updated>2023-04-06T03:44:08.471Z</updated>
+  <updated>2023-05-05T03:15:38.455Z</updated>
   <id>http://www.ilak.website/</id>
   
   <author>
@@ -21,16 +21,10 @@
     <link href="http://www.ilak.website/2023/04/04/consul%E8%BF%81%E7%A7%BB/"/>
     <id>http://www.ilak.website/2023/04/04/consul%E8%BF%81%E7%A7%BB/</id>
     <published>2023-04-03T16:31:17.000Z</published>
-    <updated>2023-04-06T03:44:08.471Z</updated>
+    <updated>2023-05-05T03:15:38.455Z</updated>
     
     
-      
-      
-        
-        
-    <summary type="html">&lt;h2 id=&quot;consul架构&quot;&gt;&lt;a href=&quot;#consul架构&quot; class=&quot;headerlink&quot; title=&quot;consul架构&quot;&gt;&lt;/a&gt;consul架构&lt;/h2&gt;&lt;p&gt;&lt;img</summary>
-        
-      
+    <summary type="html">&lt;p&gt;原consul集群迁移，需完整还原历史数据的同时更换ip，并升级consul版本。&lt;/p&gt;</summary>
     
     
     

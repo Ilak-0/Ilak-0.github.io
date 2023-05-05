@@ -3,7 +3,9 @@
   <entry>
     <title>记一次consul迁移</title>
     <url>/2023/04/04/consul%E8%BF%81%E7%A7%BB/</url>
-    <content><![CDATA[<h2 id="consul架构"><a href="#consul架构" class="headerlink" title="consul架构"></a>consul架构</h2><p><img src="/2023/04/04/consul%E8%BF%81%E7%A7%BB/assets.jpg"></p>
+    <content><![CDATA[<p>原consul集群迁移，需完整还原历史数据的同时更换ip，并升级consul版本。</p>
+<span id="more"></span>
+<h2 id="consul架构"><a href="#consul架构" class="headerlink" title="consul架构"></a>consul架构</h2><p><img src="/2023/04/04/consul%E8%BF%81%E7%A7%BB/assets.jpg"></p>
 <h2 id="background"><a href="#background" class="headerlink" title="background"></a>background</h2><ul>
 <li>原机房弃用</li>
 <li>原consul使用单一dc，三节点集群</li>
@@ -44,7 +46,7 @@
 <li>Sidecar Proxy Max: Inclusive max port number to use for automatically assigned sidecar service registrations. 21255</li>
 </ul>
 <h2 id="scp命令"><a href="#scp命令" class="headerlink" title="scp命令"></a>scp命令</h2><h3 id="本地-发送至-远程"><a href="#本地-发送至-远程" class="headerlink" title="本地 发送至 远程"></a>本地 发送至 远程</h3><ol>
-<li>复制单个文件<br>scp 本地文件路径 远程用户名@ip地址:远程路径<br>scp .&#x2F;test.txt <a href="mailto:&#x72;&#111;&#111;&#x74;&#x40;&#48;&#46;&#48;&#46;&#x30;&#46;&#x30;">&#x72;&#111;&#111;&#x74;&#x40;&#48;&#46;&#48;&#46;&#x30;&#46;&#x30;</a>:&#x2F;home&#x2F;me</li>
+<li>复制单个文件<br>scp 本地文件路径 远程用户名@ip地址:远程路径<br>scp .&#x2F;test.txt <a href="mailto:&#x72;&#x6f;&#111;&#116;&#64;&#x30;&#46;&#x30;&#x2e;&#48;&#46;&#48;">&#x72;&#x6f;&#111;&#116;&#64;&#x30;&#46;&#x30;&#x2e;&#48;&#46;&#48;</a>:&#x2F;home&#x2F;me</li>
 <li>复制文件夹<br>scp -r 本地文件夹路径 远程用户名@ip地址:远程路径</li>
 </ol>
 <h3 id="远程-拷贝至-本地"><a href="#远程-拷贝至-本地" class="headerlink" title="远程 拷贝至 本地"></a>远程 拷贝至 本地</h3><ol>
