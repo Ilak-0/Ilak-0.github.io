@@ -212,104 +212,14 @@
         
       
       
-        <h2 id="语言基础"><a href="#语言基础" class="headerlink" title="语言基础"></a>语言基础</h2><ul>
-<li>语言分类(编译与解释)</li>
-<li>Go,C&#x2F;C++</li>
-<li>切片内存结构</li>
-<li>Map内存结构</li>
-<li>函数参数传递(值,指针)</li>
-<li>defer调用时机(调用顺序,return先后顺序,代码块等)</li>
-<li>函数绑定方式(区别)</li>
-<li>Go如何实现继承(多接口继承等)</li>
-<li>chan有缓冲,无缓冲</li>
-<li>select中default作用(读chan,写chan)</li>
-<li>Go中的闭包(需要注意什么)</li>
-</ul>
-<h3 id="高阶"><a href="#高阶" class="headerlink" title="高阶"></a>高阶</h3><ul>
-<li>go协程为什么性能高(真的高吗?相比Java高在什么地方)</li>
-<li>协程与线程的区别关系(真的比线程性能高吗?什么情况有优势,什么情况无优势)</li>
-<li>GC触发机制是什么</li>
-<li>协程调试机制是什么</li>
-<li>如何分析内存使用情况(定位内存泄露,死锁)</li>
-</ul>
-<h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><ul>
-<li>restful,rpc区别</li>
-<li>用过哪些go的网络框架</li>
-<li>restful常用的动作有哪些</li>
-<li>一个url绑定多个动作</li>
-<li>一个网络请求阻塞会影响其它的吗?</li>
-</ul>
-<h3 id="高阶-1"><a href="#高阶-1" class="headerlink" title="高阶"></a>高阶</h3><ul>
-<li>ip,tcp,http层级与关系</li>
-<li>tcp握手与断开大致流程</li>
-<li>什么是tcp粘包(工作中是否遇到过,如何解决)</li>
-<li>工作中是否做过跨公网通信的项目(如何提高网络吞吐量)</li>
-</ul>
-<h2 id="数据库-Sql-NoSql"><a href="#数据库-Sql-NoSql" class="headerlink" title="数据库(Sql,NoSql)"></a>数据库(Sql,NoSql)</h2><ul>
-<li>mysql存储引擎有哪几种,各自的特点是什么?</li>
-<li>视图与表的关系(区别)</li>
-<li>关联查询有哪几种(区别)</li>
-<li>索引的分类(区别)</li>
-<li>索引的匹配规则</li>
-<li>索引是否越多越好,为什么?</li>
-<li>是否使用过es或是某种no-sql存储系统?</li>
-<li>es的分片机制是什么(如果用过es)</li>
-<li>es查询分类?(如果用过es)</li>
-<li>es分词与全文检索区别(如果用过es)</li>
-<li>redis为什么快?</li>
-<li>工作中什么场景中用到过redis,怎么用的?</li>
-</ul>
-<h3 id="高阶-2"><a href="#高阶-2" class="headerlink" title="高阶"></a>高阶</h3><ul>
-<li>什么是二级索引(与一级索引的区别)</li>
-<li>什么是回表如何避免回表</li>
-<li>mysql中innodb索引的存储结构(为什么切换B-到B+)</li>
-<li>redis的key驱逐策略有哪几种</li>
-<li>redis的key驱逐时机</li>
-<li>redis是否具体的持久化的能力(分哪向种,区别)</li>
-</ul>
-<h2 id="消息中间件-Kafka"><a href="#消息中间件-Kafka" class="headerlink" title="消息中间件(Kafka)"></a>消息中间件(Kafka)</h2><ul>
-<li>是否使用过kafka</li>
-<li>kafka中consumer与group的关系</li>
-<li>服务如何保证不会重复消费消息</li>
-<li>生产者如何保证消息的一致性</li>
-</ul>
-<h3 id="高阶-3"><a href="#高阶-3" class="headerlink" title="高阶"></a>高阶</h3><ul>
-<li>什么是kafka扩(缩)容</li>
-<li>扩(缩)容时服务应该(可能)需要做什么工作</li>
-</ul>
-<h2 id="云原生"><a href="#云原生" class="headerlink" title="云原生"></a>云原生</h2><ul>
-<li><ul>
-<li>工作中是否使用docker</li>
-</ul>
-</li>
-<li><ul>
-<li>工作路是否使用某种k8s平台</li>
-</ul>
-</li>
-<li><ul>
-<li>IaaS,PaaS,SaaS是指什么,k8s属于哪一种</li>
-</ul>
-</li>
-</ul>
-<h3 id="高阶-4"><a href="#高阶-4" class="headerlink" title="高阶"></a>高阶</h3><ul>
-<li>是否了解k8s平台的关键组件及其主要功能</li>
-<li>什么是k8s的CRD,Operators(关系,区别)</li>
-<li>是否做过k8s的二次开发</li>
-<li>在k8s平台运行的服务出错(崩溃,死锁,内存泄露)如何解决</li>
-<li>是否了解或是使用过serverless平台</li>
-</ul>
-<h2 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h2><ul>
-<li>随机选择一些简单的算法</li>
-</ul>
-<h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><ul>
-<li>是否了解或是使用过大数据平台</li>
-<li>hadoop与spark关系(区别)</li>
-<li>是否了解或是使用过flink</li>
-<li>是否使用过或了解prometheus监控系统</li>
-<li>是否分析过工作工作中使用过开源系统的源码?</li>
-<li>是否参与过某个开源项目(github地址)</li>
-</ul>
-
+        <p>面试内容由浅入深，值得参考</p>
+        
+          <p>
+            <a class="article-more-link" href="/2022/04/13/%E6%9F%90500%E5%85%AC%E5%8F%B8golang%E9%9D%A2%E8%AF%95%E9%A2%98/">
+              Read More...
+            </a>
+          </p>
+        
       
     </div>
     <footer class="article-footer">
