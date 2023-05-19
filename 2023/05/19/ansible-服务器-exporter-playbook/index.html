@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  <meta name="description" content="世事一场大梦，人生几度秋凉？夜来风叶已鸣廊。看取眉头鬓上。酒贱常愁客少，月明多被云妨。中秋谁与共孤光。把盏凄然北望。">
+  
+  <title>
+    ansible 服务器 exporter playbook |
+    
+    Ilak
+  </title>
+  <!-- Icon -->
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="Ilak" type="application/atom+xml">
+</head>
+
+<body>
+  <main class="content">
+    <section class="outer">
+  <article id="post-ansible-服务器-exporter-playbook" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h1 class="article-title" itemprop="name">
+    ansible 服务器 exporter playbook
+  </h1>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/05/19/ansible-%E6%9C%8D%E5%8A%A1%E5%99%A8-exporter-playbook/" class="article-date">
+  <time datetime="2023-05-19T01:56:27.000Z" itemprop="datePublished">2023-05-19</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p>just playbook yaml, no more</p>
+<span id="more"></span>
+<p>Node exporter<br>playbooks</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Install</span> <span class="string">and</span> <span class="string">configure</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">all</span></span><br><span class="line">  <span class="attr">become:</span> <span class="literal">yes</span></span><br><span class="line">  <span class="attr">gather_facts:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">vars:</span></span><br><span class="line">    <span class="attr">node_exporter_version:</span> <span class="string">&quot;1.5.0&quot;</span></span><br><span class="line">    <span class="attr">node_exporter_download_url:</span> <span class="string">&quot;https://github.com/prometheus/node_exporter/releases/download/v<span class="template-variable">&#123;&#123; node_exporter_version &#125;&#125;</span>/node_exporter-<span class="template-variable">&#123;&#123; node_exporter_version &#125;&#125;</span>.<span class="template-variable">&#123;&#123; ansible_system | lower &#125;&#125;</span>-amd64.tar.gz&quot;</span></span><br><span class="line">    <span class="attr">node_exporter_install_dir:</span> <span class="string">&quot;/opt/node_exporter&quot;</span></span><br><span class="line">    <span class="attr">node_exporter_config_file:</span> <span class="string">&quot;/etc/node_exporter/node_exporter.yml&quot;</span></span><br><span class="line">    <span class="attr">node_exporter_scrape_interval:</span> <span class="string">&quot;30s&quot;</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">     <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">create</span> <span class="string">exporter</span> <span class="string">group</span></span><br><span class="line">        <span class="attr">group:</span> <span class="string">name=exporter</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">create</span> <span class="string">node_exporter</span> <span class="string">user</span></span><br><span class="line">      <span class="attr">user:</span></span><br><span class="line">          <span class="string">name=node_exporter</span></span><br><span class="line">          <span class="string">comment=&quot;prometheus</span> <span class="string">node_exporter</span> <span class="string">user&quot;</span></span><br><span class="line">          <span class="string">group=exporter</span></span><br><span class="line">          <span class="string">shell=/sbin/nologin</span></span><br><span class="line">          <span class="string">createhome=no</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Download</span> <span class="string">and</span> <span class="string">extract</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">get_url:</span></span><br><span class="line">        <span class="attr">url:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; node_exporter_download_url &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;/tmp/node_exporter.tar.gz&quot;</span></span><br><span class="line">      <span class="attr">register:</span> <span class="string">node_exporter_download</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Extract</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">unarchive:</span></span><br><span class="line">        <span class="attr">src:</span> <span class="string">&quot;/tmp/node_exporter.tar.gz&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; node_exporter_install_dir &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">remote_src:</span> <span class="literal">yes</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">node_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Create</span> <span class="string">Node</span> <span class="string">Exporter</span> <span class="string">config</span> <span class="string">directory</span></span><br><span class="line">      <span class="attr">file:</span></span><br><span class="line">        <span class="attr">path:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; node_exporter_config_file | dirname &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">directory</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Configure</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">template:</span></span><br><span class="line">        <span class="attr">src:</span> <span class="string">&quot;templates/node_exporter.yml.j2&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; node_exporter_config_file &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">owner:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">group:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">mode:</span> <span class="number">0644</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">node_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Start</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">systemd:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">node_exporter</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">started</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">yes</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">node_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">handlers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Reload</span> <span class="string">systemd</span></span><br><span class="line">      <span class="attr">systemd:</span></span><br><span class="line">        <span class="attr">daemon_reload:</span> <span class="literal">yes</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Restart</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">systemd:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">node_exporter</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">restarted</span></span><br></pre></td></tr></table></figure>
+
+<p>node_exporter.yml.j2</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">global:</span></span><br><span class="line">  <span class="attr">scrape_interval:</span> &#123;&#123; <span class="string">node_exporter_scrape_interval</span> &#125;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">collectors:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">cpu</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">diskstats</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">filesystem</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">filefd</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">loadavg</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">stat</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">time</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">vmstat</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">tcpstat</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">meminfo</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">netstat</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">uname</span></span><br></pre></td></tr></table></figure>
+<p>wmi exporter</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Install</span> <span class="string">and</span> <span class="string">configure</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">windows_servers</span></span><br><span class="line">  <span class="attr">gather_facts:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">vars:</span></span><br><span class="line">    <span class="attr">wmi_exporter_version:</span> <span class="string">&quot;0.22.0&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_download_url:</span> <span class="string">&quot;https://github.com/martinlindhe/wmi_exporter/releases/download/v<span class="template-variable">&#123;&#123; wmi_exporter_version &#125;&#125;</span>/wmi_exporter-<span class="template-variable">&#123;&#123; wmi_exporter_version &#125;&#125;</span>.windows-amd64.zip&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_install_dir:</span> <span class="string">&quot;C:\\Program Files\\wmi_exporter&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_config_file:</span> <span class="string">&quot;C:\\Program Files\\wmi_exporter\\wmi_exporter.yml&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_scrape_interval:</span> <span class="string">&quot;30s&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_collectors:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">cpu</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">cpu_info</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">cs</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">memory</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">logical_disk</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">os</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">system</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">process</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">net</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">tcp</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="comment"># Download and extract WMI Exporter</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Download</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">win_get_url:</span></span><br><span class="line">        <span class="attr">url:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_download_url &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; playbook_dir &#125;&#125;</span>/wmi_exporter.zip&quot;</span></span><br><span class="line">      <span class="attr">register:</span> <span class="string">wmi_exporter_download</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Extract</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">win_unzip:</span></span><br><span class="line">        <span class="attr">src:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; playbook_dir &#125;&#125;</span>/wmi_exporter.zip&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_install_dir &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">wmi_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Configure WMI Exporter</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Configure</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">win_template:</span></span><br><span class="line">        <span class="attr">src:</span> <span class="string">templates/wmi_exporter.yml.j2</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_config_file &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">vars:</span></span><br><span class="line">        <span class="attr">wmi_exporter_scrape_interval:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_scrape_interval &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">wmi_exporter_collectors:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_collectors &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">wmi_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Start WMI Exporter service</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Start</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">win_service:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">wmi_exporter</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">started</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">yes</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">wmi_exporter_download.changed</span></span><br><span class="line"><span class="string">```</span>      </span><br><span class="line"><span class="string">wmi_exporter.yml.j2</span></span><br><span class="line"><span class="string">```yaml</span></span><br><span class="line"><span class="attr">global:</span></span><br><span class="line">  <span class="attr">scrape_interval:</span> &#123;&#123; <span class="string">wmi_exporter_scrape_interval</span> &#125;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">collectors:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">cpu</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">logical_disk</span></span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">if</span> <span class="string">&#x27;memory&#x27;</span> <span class="string">in</span> <span class="string">wmi_exporter_collectors</span> <span class="string">%</span>&#125;</span><br><span class="line">  <span class="bullet">-</span> <span class="string">memory</span></span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">endif</span> <span class="string">%</span>&#125;</span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">if</span> <span class="string">&#x27;net&#x27;</span> <span class="string">in</span> <span class="string">wmi_exporter_collectors</span> <span class="string">%</span>&#125;</span><br><span class="line">  <span class="bullet">-</span> <span class="string">net</span></span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">endif</span> <span class="string">%</span>&#125;</span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">if</span> <span class="string">&#x27;os&#x27;</span> <span class="string">in</span> <span class="string">wmi_exporter_collectors</span> <span class="string">%</span>&#125;</span><br><span class="line">  <span class="bullet">-</span> <span class="string">os</span></span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">endif</span> <span class="string">%</span>&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.ilak.website/2023/05/19/ansible-%E6%9C%8D%E5%8A%A1%E5%99%A8-exporter-playbook/" data-id="clhtx698z0000e0nj7m830phn" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+  
+<nav class="article-nav">
+  
+  
+  <a href="/2023/05/08/linux-install-docker/" class="article-nav-link">
+    <strong class="article-nav-caption">Older</strong>
+    <div class="article-nav-title">linux install docker</div>
+  </a>
+  
+</nav>
+
+  
+
+  
+  
+  
+<div class="gitalk" id="gitalk-container"></div>
+
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+
+
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+
+<script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+
+<script type="text/javascript">
+  var gitalk = new Gitalk({
+    clientID: 'dcecf7086556839934c8',
+    clientSecret: '03265ecdcf7197609a6ef31713a31cb885ba61c4',
+    repo: 'gittalk',
+    owner: 'ilak-0',
+    admin: ['ilak-0'],
+    // id: location.pathname,      // Ensure uniqueness and length less than 50
+    id: md5(location.pathname),
+    distractionFreeMode: false,  // Facebook-like distraction free mode
+    pagerDirection: 'last'
+  })
+
+  gitalk.render('gitalk-container')
+</script>
+
+  
+
+</article>
+</section>
+    <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>Ilak &copy; 2023</li>
+      
+        <li>
+          
+            <a href="https://beian.miit.gov.cn/" target="_blank"></a>
+            
+        </li>
+      
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>theme  <a target="_blank" rel="noopener" href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+    <p><ul class="list-inline">
+  
+  <li><i class="fe fe-smile-alt tooltip" data-tooltip="UV"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+  <li><i class="fe fe-bookmark tooltip" data-tooltip="PV"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul></p>
+  </div>
+</footer>
+  </main>
+  <aside class="sidebar">
+    <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/proto.jpg" alt="Ilak"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">文档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/gallery">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="fe fe-feed"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+  </aside>
+  
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+<script src="/js/tocbot.min.js"></script>
+
+
+<script>
+  // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+  });
+</script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+
+</html>

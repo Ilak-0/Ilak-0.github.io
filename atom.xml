@@ -6,7 +6,7 @@
   <link href="http://www.ilak.website/atom.xml" rel="self"/>
   
   <link href="http://www.ilak.website/"/>
-  <updated>2023-05-08T06:02:07.858Z</updated>
+  <updated>2023-05-19T02:09:40.889Z</updated>
   <id>http://www.ilak.website/</id>
   
   <author>
@@ -17,11 +17,26 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>ansible 服务器 exporter playbook</title>
+    <link href="http://www.ilak.website/2023/05/19/ansible-%E6%9C%8D%E5%8A%A1%E5%99%A8-exporter-playbook/"/>
+    <id>http://www.ilak.website/2023/05/19/ansible-%E6%9C%8D%E5%8A%A1%E5%99%A8-exporter-playbook/</id>
+    <published>2023-05-19T01:56:27.000Z</published>
+    <updated>2023-05-19T02:09:40.889Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;just playbook yaml, no more&lt;/p&gt;</summary>
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
     <title>linux install docker</title>
     <link href="http://www.ilak.website/2023/05/08/linux-install-docker/"/>
     <id>http://www.ilak.website/2023/05/08/linux-install-docker/</id>
     <published>2023-05-08T05:58:12.000Z</published>
-    <updated>2023-05-08T06:02:07.858Z</updated>
+    <updated>2023-05-19T02:09:41.414Z</updated>
     
     
     <summary type="html">&lt;p&gt;centos and ubuntu&lt;/p&gt;</summary>
