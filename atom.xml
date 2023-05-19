@@ -6,7 +6,7 @@
   <link href="http://www.ilak.website/atom.xml" rel="self"/>
   
   <link href="http://www.ilak.website/"/>
-  <updated>2023-05-19T02:09:40.889Z</updated>
+  <updated>2023-05-19T02:21:40.537Z</updated>
   <id>http://www.ilak.website/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="http://www.ilak.website/2023/05/19/ansible-%E6%9C%8D%E5%8A%A1%E5%99%A8-exporter-playbook/"/>
     <id>http://www.ilak.website/2023/05/19/ansible-%E6%9C%8D%E5%8A%A1%E5%99%A8-exporter-playbook/</id>
     <published>2023-05-19T01:56:27.000Z</published>
-    <updated>2023-05-19T02:09:40.889Z</updated>
+    <updated>2023-05-19T02:21:40.537Z</updated>
     
     
     <summary type="html">&lt;p&gt;just playbook yaml, no more&lt;/p&gt;</summary>
