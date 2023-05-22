@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>istio架构图</title>
+    <url>/2023/05/22/istio%E6%9E%B6%E6%9E%84%E5%9B%BE/</url>
+    <content><![CDATA[<p><img src="/2023/05/22/istio%E6%9E%B6%E6%9E%84%E5%9B%BE/arch.svg"></p>
+]]></content>
+  </entry>
+  <entry>
     <title>ansible 服务器 exporter playbook</title>
     <url>/2023/05/19/ansible-%E6%9C%8D%E5%8A%A1%E5%99%A8-exporter-playbook/</url>
     <content><![CDATA[<p>just playbook yaml, no more</p>
