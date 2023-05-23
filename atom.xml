@@ -6,7 +6,7 @@
   <link href="http://www.ilak.website/atom.xml" rel="self"/>
   
   <link href="http://www.ilak.website/"/>
-  <updated>2023-05-22T02:57:10.593Z</updated>
+  <updated>2023-05-23T03:49:18.897Z</updated>
   <id>http://www.ilak.website/</id>
   
   <author>
@@ -15,6 +15,21 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>promxy config</title>
+    <link href="http://www.ilak.website/2023/05/23/promxy-config/"/>
+    <id>http://www.ilak.website/2023/05/23/promxy-config/</id>
+    <published>2023-05-23T03:45:17.000Z</published>
+    <updated>2023-05-23T03:49:18.897Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;promxy proxy prometheus endpoints as a single server to approve api server&lt;br&gt;use docker hub’s pubilc image&lt;br&gt;github repo : &lt;a href=&quot;https://github.com/jacksontj/promxy&quot;&gt;https://github.com/jacksontj/promxy&lt;/a&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>istio架构图</title>
