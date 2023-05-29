@@ -1,6 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>cpu mode</title>
+    <url>/2023/05/29/cpu-mode/</url>
+    <content><![CDATA[<p>时常忘记，记录</p>
+<span id="more"></span>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>表达的内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>user</td>
+<td>从系统启动开始累计到当前时刻，用户态的CPU时间，不包含nice值为负进程</td>
+</tr>
+<tr>
+<td>nice</td>
+<td>从系统启动开始累计到当前时刻，nice值为负的进程所占用的CPU时间</td>
+</tr>
+<tr>
+<td>system</td>
+<td>从系统启动开始累计当前时刻，核心时间</td>
+</tr>
+<tr>
+<td>idle</td>
+<td>从系统启动开始累计到当前时刻，除IO等待时间以外其它等待时间</td>
+</tr>
+<tr>
+<td>iowait</td>
+<td>从系统启动开始累计到当前时刻，IO等待时间</td>
+</tr>
+<tr>
+<td>irq</td>
+<td>从系统启动开始累计到当前时刻，硬中断时间</td>
+</tr>
+<tr>
+<td>softirq</td>
+<td>从系统启动开始累计到当前时刻，软中断时间</td>
+</tr>
+<tr>
+<td>stealstolen</td>
+<td>当一台物理机有多个虚拟机时，该cpu在其他虚拟机运行的时间</td>
+</tr>
+<tr>
+<td>guest</td>
+<td>在cpu内核控制下，提供给在上面运行虚拟机占用的cpu时间</td>
+</tr>
+</tbody></table>
+]]></content>
+      <tags>
+        <tag>monitor</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>promxy config</title>
     <url>/2023/05/23/promxy-config/</url>
     <content><![CDATA[<p>promxy<br>proxy prometheus endpoints as a single server to provide api services<br>use docker hub’s pubilc image<br>github repo : <a href="https://github.com/jacksontj/promxy">https://github.com/jacksontj/promxy</a></p>
