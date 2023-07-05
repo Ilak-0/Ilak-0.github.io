@@ -6,7 +6,7 @@
   <link href="http://www.ilak.website/atom.xml" rel="self"/>
   
   <link href="http://www.ilak.website/"/>
-  <updated>2023-05-30T05:36:45.564Z</updated>
+  <updated>2023-07-05T06:02:36.186Z</updated>
   <id>http://www.ilak.website/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>consul cluster</title>
+    <link href="http://www.ilak.website/2023/07/05/consul-cluster/"/>
+    <id>http://www.ilak.website/2023/07/05/consul-cluster/</id>
+    <published>2023-07-05T05:57:02.000Z</published>
+    <updated>2023-07-05T06:02:36.186Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;consul&quot;&gt;&lt;a href=&quot;#consul&quot; class=&quot;headerlink&quot; title=&quot;consul&quot;&gt;&lt;/a&gt;consul&lt;/h1&gt;&lt;h2 id=&quot;consul-agent-register-service&quot;&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>work_schedule</title>
