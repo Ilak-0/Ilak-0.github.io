@@ -67,6 +67,61 @@
     <h1 class="page-type-title"></h1>
     
     
+    <article id="post-golang-type-memory" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+      
+  
+  <h2 class="article-title" itemprop="name">
+    <a href="/2023/08/17/golang-type-memory/">golang type memory</a>
+  </h2>
+  
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2023/08/17/golang-type-memory/" class="article-date">
+  <time datetime="2023-08-17T05:42:10.000Z" itemprop="datePublished">2023-08-17</time>
+</a>
+      
+    </div>
+    
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        
+      
+      
+        <h2 id="map"><a href="#map" class="headerlink" title="map"></a>map</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> hmap <span class="keyword">struct</span> &#123;</span><br><span class="line">   <span class="comment">// Note: the format of the hmap is also encoded in cmd/compile/internal/reflectdata/reflect.go.</span></span><br><span class="line">   <span class="comment">// Make sure this stays in sync with the compiler&#x27;s definition.</span></span><br><span class="line">   count     <span class="type">int</span> <span class="comment">// # live cells == size of map.  Must be first (used by len() builtin)</span></span><br><span class="line">   flags     <span class="type">uint8</span></span><br><span class="line">   B         <span class="type">uint8</span>  <span class="comment">// log_2 of # of buckets (can hold up to loadFactor * 2^B items)</span></span><br><span class="line">   noverflow <span class="type">uint16</span> <span class="comment">// approximate number of overflow buckets; see incrnoverflow for details</span></span><br><span class="line">   hash0     <span class="type">uint32</span> <span class="comment">// hash seed</span></span><br><span class="line"></span><br><span class="line">   buckets    unsafe.Pointer <span class="comment">// array of 2^B Buckets. may be nil if count==0.</span></span><br><span class="line">   oldbuckets unsafe.Pointer <span class="comment">// previous bucket array of half the size, non-nil only when growing</span></span><br><span class="line">   nevacuate  <span class="type">uintptr</span>        <span class="comment">// progress counter for evacuation (buckets less than this have been evacuated)</span></span><br><span class="line"></span><br><span class="line">   extra *mapextra <span class="comment">// optional fields</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// mapextra holds fields that are not present on all maps.</span></span><br><span class="line"><span class="keyword">type</span> mapextra <span class="keyword">struct</span> &#123;</span><br><span class="line">   <span class="comment">// If both key and elem do not contain pointers and are inline, then we mark bucket</span></span><br><span class="line">   <span class="comment">// type as containing no pointers. This avoids scanning such maps.</span></span><br><span class="line">   <span class="comment">// However, bmap.overflow is a pointer. In order to keep overflow buckets</span></span><br><span class="line">   <span class="comment">// alive, we store pointers to all overflow buckets in hmap.extra.overflow and hmap.extra.oldoverflow.</span></span><br><span class="line">   <span class="comment">// overflow and oldoverflow are only used if key and elem do not contain pointers.</span></span><br><span class="line">   <span class="comment">// overflow contains overflow buckets for hmap.buckets.</span></span><br><span class="line">   <span class="comment">// oldoverflow contains overflow buckets for hmap.oldbuckets.</span></span><br><span class="line">   <span class="comment">// The indirection allows to store a pointer to the slice in hiter.</span></span><br><span class="line">   overflow    *[]*bmap</span><br><span class="line">   oldoverflow *[]*bmap</span><br><span class="line"></span><br><span class="line">   <span class="comment">// nextOverflow holds a pointer to a free overflow bucket.</span></span><br><span class="line">   nextOverflow *bmap</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// A bucket for a Go map.</span></span><br><span class="line"><span class="keyword">type</span> bmap <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">// tophash generally contains the top byte of the hash value</span></span><br><span class="line">	<span class="comment">// for each key in this bucket. If tophash[0] &lt; minTopHash,</span></span><br><span class="line">	<span class="comment">// tophash[0] is a bucket evacuation state instead.</span></span><br><span class="line">	tophash [bucketCnt]<span class="type">uint8</span></span><br><span class="line">	<span class="comment">// Followed by bucketCnt keys and then bucketCnt elems.</span></span><br><span class="line">	<span class="comment">// <span class="doctag">NOTE:</span> packing all the keys together and then all the elems together makes the</span></span><br><span class="line">	<span class="comment">// code a bit more complicated than alternating key/elem/key/elem/... but it allows</span></span><br><span class="line">	<span class="comment">// us to eliminate padding which would be needed for, e.g., map[int64]int8.</span></span><br><span class="line">	<span class="comment">// Followed by an overflow pointer.</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="slice"><a href="#slice" class="headerlink" title="slice"></a>slice</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> slice <span class="keyword">struct</span> &#123;</span><br><span class="line">	array unsafe.Pointer</span><br><span class="line">	<span class="built_in">len</span>   <span class="type">int</span></span><br><span class="line">	<span class="built_in">cap</span>   <span class="type">int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.ilak.website/2023/08/17/golang-type-memory/" data-id="clleqr2gh000020nj23qyh0n9" class="article-share-link">
+        Share
+      </a>
+      
+    </footer>
+
+  </div>
+
+  
+
+  
+
+</article>
+    
     <article id="post-golang-fastcache" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
@@ -567,65 +622,6 @@
     </div>
     <footer class="article-footer">
       <a data-url="http://www.ilak.website/2023/05/08/linux-install-docker/" data-id="clhefrd4200001onjcrs7hesh" class="article-share-link">
-        Share
-      </a>
-      
-    </footer>
-
-  </div>
-
-  
-
-  
-
-</article>
-    
-    <article id="post-consul迁移" class="article article-type-post" itemscope
-  itemprop="blogPost" data-scroll-reveal>
-
-  <div class="article-inner">
-    
-    <header class="article-header">
-      
-  
-  <h2 class="article-title" itemprop="name">
-    <a href="/2023/04/04/consul%E8%BF%81%E7%A7%BB/">记一次consul迁移</a>
-  </h2>
-  
-  
-
-    </header>
-    
-
-    
-    <div class="article-meta">
-      <a href="/2023/04/04/consul%E8%BF%81%E7%A7%BB/" class="article-date">
-  <time datetime="2023-04-03T16:31:17.000Z" itemprop="datePublished">2023-04-04</time>
-</a>
-      
-    </div>
-    
-
-    
-
-    <div class="article-entry" itemprop="articleBody">
-      
-      
-        
-      
-      
-        <p>原consul集群迁移，需完整还原历史数据的同时更换ip，并升级consul版本。</p>
-        
-          <p>
-            <a class="article-more-link" href="/2023/04/04/consul%E8%BF%81%E7%A7%BB/">
-              Read More...
-            </a>
-          </p>
-        
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.ilak.website/2023/04/04/consul%E8%BF%81%E7%A7%BB/" data-id="clg4hc1a300045snj18ncc2er" class="article-share-link">
         Share
       </a>
       
