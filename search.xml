@@ -1,152 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Docker Mimir test remind</title>
-    <url>/2023/08/28/Docker-Mimir-test-remind/</url>
-    <content><![CDATA[<p>grafana new kv store,100% support prometheus,storage cluster,test cmd</p>
+    <title>记一次consul迁移</title>
+    <url>/2023/04/04/consul%E8%BF%81%E7%A7%BB/</url>
+    <content><![CDATA[<p>原consul集群迁移，需完整还原历史数据的同时更换ip，并升级consul版本。</p>
 <span id="more"></span>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">        --net host \</span><br><span class="line">        --name prometheus-test \</span><br><span class="line">        --restart always \</span><br><span class="line">        -u root \</span><br><span class="line">        --privileged=<span class="literal">true</span> \</span><br><span class="line">        -v E:\docker\prometheus:/data/prometheus \</span><br><span class="line">        -p 9090:9090 \</span><br><span class="line">        ubuntu/prometheus \</span><br><span class="line">        --config.file=/data/prometheus/prometheus.yml \</span><br><span class="line">        --storage.tsdb.path=/prometheus \</span><br><span class="line">        --storage.tsdb.retention.time=10d \</span><br><span class="line">        --web.enable-lifecycle \</span><br><span class="line">        --web.enable-admin-api</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">docker run \</span><br><span class="line">  --<span class="built_in">rm</span> \</span><br><span class="line">  --name mimir \</span><br><span class="line">  --publish 9009:9009 \</span><br><span class="line">  --volume E:\docker\mimir/demo.yaml:/etc/mimir/demo.yaml grafana/mimir:latest \</span><br><span class="line">  --config.file=/etc/mimir/demo.yaml</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">docker run -d  --network grafanet --name prometheus-test -u root -v e:\\docker\\prometheus:/data/prometheus -p 9090:9090 ubuntu/prometheus --config.file=/data/prometheus/conf/prometheus.yml --storage.tsdb.path=/prometheus  --storage.tsdb.retention.time=10d  --web.enable-lifecycle  --web.enable-admin-api</span><br><span class="line"></span><br><span class="line">docker run -d --<span class="built_in">rm</span> --network grafanet --name mimir --publish 9009:9009 --volume E:\docker\mimir/demo.yaml:/etc/mimir/demo.yaml grafana/mimir:latest --config.file=/etc/mimir/demo.yaml</span><br><span class="line"></span><br><span class="line">docker run -d --<span class="built_in">rm</span> --name=grafana --network=grafanet -p 3000:3000 grafana/grafana</span><br></pre></td></tr></table></figure>]]></content>
-  </entry>
-  <entry>
-    <title>golang type memory</title>
-    <url>/2023/08/17/golang-type-memory/</url>
-    <content><![CDATA[<h2 id="map"><a href="#map" class="headerlink" title="map"></a>map</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> hmap <span class="keyword">struct</span> &#123;</span><br><span class="line">   <span class="comment">// Note: the format of the hmap is also encoded in cmd/compile/internal/reflectdata/reflect.go.</span></span><br><span class="line">   <span class="comment">// Make sure this stays in sync with the compiler&#x27;s definition.</span></span><br><span class="line">   count     <span class="type">int</span> <span class="comment">// # live cells == size of map.  Must be first (used by len() builtin)</span></span><br><span class="line">   flags     <span class="type">uint8</span></span><br><span class="line">   B         <span class="type">uint8</span>  <span class="comment">// log_2 of # of buckets (can hold up to loadFactor * 2^B items)</span></span><br><span class="line">   noverflow <span class="type">uint16</span> <span class="comment">// approximate number of overflow buckets; see incrnoverflow for details</span></span><br><span class="line">   hash0     <span class="type">uint32</span> <span class="comment">// hash seed</span></span><br><span class="line"></span><br><span class="line">   buckets    unsafe.Pointer <span class="comment">// array of 2^B Buckets. may be nil if count==0.</span></span><br><span class="line">   oldbuckets unsafe.Pointer <span class="comment">// previous bucket array of half the size, non-nil only when growing</span></span><br><span class="line">   nevacuate  <span class="type">uintptr</span>        <span class="comment">// progress counter for evacuation (buckets less than this have been evacuated)</span></span><br><span class="line"></span><br><span class="line">   extra *mapextra <span class="comment">// optional fields</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// mapextra holds fields that are not present on all maps.</span></span><br><span class="line"><span class="keyword">type</span> mapextra <span class="keyword">struct</span> &#123;</span><br><span class="line">   <span class="comment">// If both key and elem do not contain pointers and are inline, then we mark bucket</span></span><br><span class="line">   <span class="comment">// type as containing no pointers. This avoids scanning such maps.</span></span><br><span class="line">   <span class="comment">// However, bmap.overflow is a pointer. In order to keep overflow buckets</span></span><br><span class="line">   <span class="comment">// alive, we store pointers to all overflow buckets in hmap.extra.overflow and hmap.extra.oldoverflow.</span></span><br><span class="line">   <span class="comment">// overflow and oldoverflow are only used if key and elem do not contain pointers.</span></span><br><span class="line">   <span class="comment">// overflow contains overflow buckets for hmap.buckets.</span></span><br><span class="line">   <span class="comment">// oldoverflow contains overflow buckets for hmap.oldbuckets.</span></span><br><span class="line">   <span class="comment">// The indirection allows to store a pointer to the slice in hiter.</span></span><br><span class="line">   overflow    *[]*bmap</span><br><span class="line">   oldoverflow *[]*bmap</span><br><span class="line"></span><br><span class="line">   <span class="comment">// nextOverflow holds a pointer to a free overflow bucket.</span></span><br><span class="line">   nextOverflow *bmap</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// A bucket for a Go map.</span></span><br><span class="line"><span class="keyword">type</span> bmap <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">// tophash generally contains the top byte of the hash value</span></span><br><span class="line">	<span class="comment">// for each key in this bucket. If tophash[0] &lt; minTopHash,</span></span><br><span class="line">	<span class="comment">// tophash[0] is a bucket evacuation state instead.</span></span><br><span class="line">	tophash [bucketCnt]<span class="type">uint8</span></span><br><span class="line">	<span class="comment">// Followed by bucketCnt keys and then bucketCnt elems.</span></span><br><span class="line">	<span class="comment">// <span class="doctag">NOTE:</span> packing all the keys together and then all the elems together makes the</span></span><br><span class="line">	<span class="comment">// code a bit more complicated than alternating key/elem/key/elem/... but it allows</span></span><br><span class="line">	<span class="comment">// us to eliminate padding which would be needed for, e.g., map[int64]int8.</span></span><br><span class="line">	<span class="comment">// Followed by an overflow pointer.</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h2 id="slice"><a href="#slice" class="headerlink" title="slice"></a>slice</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> slice <span class="keyword">struct</span> &#123;</span><br><span class="line">	array unsafe.Pointer</span><br><span class="line">	<span class="built_in">len</span>   <span class="type">int</span></span><br><span class="line">	<span class="built_in">cap</span>   <span class="type">int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-  </entry>
-  <entry>
-    <title>golang cache</title>
-    <url>/2023/08/14/golang-fastcache/</url>
-    <content><![CDATA[<p>cache 选型对比</p>
-<span id="more"></span>
-<h2 id="缓存的目的"><a href="#缓存的目的" class="headerlink" title="缓存的目的"></a>缓存的目的</h2><ol>
-<li>提高系统的读写能力</li>
-<li>单位时间内有时效性的数据快速响应</li>
+<h2 id="consul架构"><a href="#consul架构" class="headerlink" title="consul架构"></a>consul架构</h2><p><img src="/2023/04/04/consul%E8%BF%81%E7%A7%BB/assets.jpg"></p>
+<h2 id="background"><a href="#background" class="headerlink" title="background"></a>background</h2><ul>
+<li>原机房弃用</li>
+<li>原consul使用单一dc，三节点集群</li>
+<li>三节点分别提供注册svc服务</li>
+<li>原consul版本过低，0.7</li>
+<li>使用最新版consul重新部署</li>
+<li>此集群使用过久，其中服务注册和kv存储都不能丢弃。</li>
+<li>prometheus、k8s集群及某些后端服务依赖于此consul集群</li>
+<li>consul-template依赖，同步部分配置config</li>
+<li>完整迁移历史数据</li>
+</ul>
+<h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><ol>
+<li>保留所有kv及各自节点的service注册信息</li>
+<li>升级版本至1.11.1,防止误触删除kv信息等</li>
+<li>集群化建设，提供相对稳定服务</li>
 </ol>
-<h2 id="支持内容"><a href="#支持内容" class="headerlink" title="支持内容"></a>支持内容</h2><ol>
-<li>读取写入 </li>
-<li>淘汰策略</li>
-<li>过期时间</li>
-<li>GC问题</li>
+<h2 id="方案分析"><a href="#方案分析" class="headerlink" title="方案分析"></a>方案分析</h2><ol>
+<li>使用snapshot方式可以快照复制完整信息，但遗憾的是host_id与raft信息同样会保留。由于原集群全部节点均下线，所以无法使用此方式。</li>
+<li>升级consul版本，新旧版本存在数据压缩及存储方式的不同，因此无法在一个集群内使用版本跨度过大的两个实例。</li>
+<li>查阅官网及官方git了解到，1.11.1版本在启动时会重新处理旧数据，使其成为新版本可使用的文件规则。</li>
+<li>综上所述，最终考虑使用手动复制迁移service与kv（同集群仅有kv存在数据一致性）</li>
 </ol>
-<h2 id="可选方案"><a href="#可选方案" class="headerlink" title="可选方案"></a>可选方案</h2><ol>
-<li><a href="https://github.com/coocood/freecache">freecache</a></li>
-<li><a href="https://github.com/allegro/bigcache">bigcache</a></li>
-<li><a href="https://github.com/VictoriaMetrics/fastcache">fastcache</a></li>
-<li><a href="https://github.com/glycerine/offheap">offheap</a></li>
-<li><a href="https://github.com/golang/groupcache">groupcache</a></li>
-<li><a href="https://github.com/dgraph-io/ristretto">ristretto</a></li>
-<li><a href="https://github.com/patrickmn/go-cache">go-cache</a></li>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li>scp原节点service到新服务器文件路径内，service路径位于 &#x2F;data&#x2F;services</li>
+<li>于新服务器内安装docker（restart always），使用consul镜像，mount本地路径（数据持久化）</li>
+<li>将原&#x2F;service数据导入挂载的&#x2F;data目录下</li>
+<li>docker 启动新节点（此时会发现service内数据已更新为新规则文件）<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker run --net host --name consul -v /data/consul/data:/consul/data 76802375bc5c agent -server=<span class="literal">true</span> -client=0.0.0.0 -ui --bootstrap-expect=1 -datacenter=srv -data-dir=/consul/data  -node xx.xxx.xx.xxx -<span class="built_in">bind</span> xx.xxx.xx.xxx </span><br></pre></td></tr></table></figure></li>
+<li>使用consul operator api 同步kv （无token则省略token）<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"> <span class="comment"># 导出所有kv键值对，注意最后参数&#x27;&#x27;是导出键值对的前缀，为空字符串导出所有</span></span><br><span class="line">consul kv <span class="built_in">export</span> --http-addr=http://xxx.xxx.xxx.xxx:8500  <span class="string">&#x27;&#x27;</span> &gt; /consul/backup/consul_kv.json</span><br><span class="line"></span><br><span class="line"><span class="comment"># 导入</span></span><br><span class="line">consul kv import --http-addr=http://xxx.xxx.xxx.xxx:8500 -token=b3a9bca3-6e8e-9678-ea35-ccb8fb272d42 @consul_kv.json</span><br></pre></td></tr></table></figure></li>
+<li>同方案启动另外两个节点，启动参数中使用join 加入最新master节点,–bootstrap-expect参数需要特别注意，此参数为预期节点数量，只有实际节点数与预期节点数相同时，该节点才会正常启用leader选举，否则会no leader</li>
 </ol>
-<h2 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h2><p><img src="/2023/08/14/golang-fastcache/cache%E5%AF%B9%E6%AF%94.jpg"></p>
-<h2 id="设计思路"><a href="#设计思路" class="headerlink" title="设计思路"></a>设计思路</h2><p>因长期占用内存空间，需要考虑GC对cache的影响<br>cache可以考虑使用堆外内存存储<br>避免使用指针类型<br>映射关系使用map[unit64]unit64存储<br>并发使用，可以给每个数据存储分片加读写锁<br>可在数据内维护过期时间，增加数据刷新逻辑</p>
+<h2 id="Required-Ports-v1-15-x-latest"><a href="#Required-Ports-v1-15-x-latest" class="headerlink" title="Required Ports v1.15.x (latest)"></a>Required Ports v1.15.x (latest)</h2><ul>
+<li>DNS: The DNS server (TCP and UDP)                         8600</li>
+<li>HTTP: The HTTP API (TCP Only)                             8500</li>
+<li>LAN Serf: The Serf LAN port (TCP and UDP)                 8301</li>
+<li>Wan Serf: The Serf WAN port (TCP and UDP)                 8302</li>
+<li>server: Server RPC address (TCP Only)                     8300</li>
+<li>Sidecar Proxy Min: Inclusive min port number to use for automatically assigned sidecar service registrations. 21000</li>
+<li>Sidecar Proxy Max: Inclusive max port number to use for automatically assigned sidecar service registrations. 21255</li>
+</ul>
+<h2 id="scp命令"><a href="#scp命令" class="headerlink" title="scp命令"></a>scp命令</h2><h3 id="本地-发送至-远程"><a href="#本地-发送至-远程" class="headerlink" title="本地 发送至 远程"></a>本地 发送至 远程</h3><ol>
+<li>复制单个文件<br>scp 本地文件路径 远程用户名@ip地址:远程路径<br>scp .&#x2F;test.txt <a href="mailto:&#x72;&#x6f;&#111;&#116;&#64;&#x30;&#46;&#x30;&#x2e;&#48;&#46;&#48;">&#x72;&#x6f;&#111;&#116;&#64;&#x30;&#46;&#x30;&#x2e;&#48;&#46;&#48;</a>:&#x2F;home&#x2F;me</li>
+<li>复制文件夹<br>scp -r 本地文件夹路径 远程用户名@ip地址:远程路径</li>
+</ol>
+<h3 id="远程-拷贝至-本地"><a href="#远程-拷贝至-本地" class="headerlink" title="远程 拷贝至 本地"></a>远程 拷贝至 本地</h3><ol>
+<li>复制单个文件<br>scp 远程用户名@ip地址:远程路径 本地文件路径</li>
+<li>复制文件夹<br>scp -r 远程用户名@ip地址:远程路径 本地文件夹路径</li>
+</ol>
+<h2 id="consul-启动参数"><a href="#consul-启动参数" class="headerlink" title="consul 启动参数"></a>consul 启动参数</h2><ul>
+<li>-server：以 server 模式启动代理</li>
+<li>-data-dir： 配置 consul 数据存储路径</li>
+</ul>
+<p>##bootstrap-expect 未设置的情况会导致consul无法完成选举，各存活节点选举自身。全部节点需设置相同节点数，且实际数量要与期望节点数目一制</p>
+<ul>
+<li>-bootstrap-expect：期望的 server 节点数目，consul 一直等到指定sever数目的时候才会引导整个集群</li>
+<li>-bind：绑定的 IP 地址，默认是 0.0.0.0</li>
+<li>-node：节点在集群中的名称，在一个集群中必须是唯一的，默认是该节点的主机名</li>
+<li>-ui： 开启 web 管理界面</li>
+<li>-config-dir：配置文件目录，所有以 .json 结尾的文件都会被加载，可以是服务或 Consul 自身的配置</li>
+<li>-client：提供 HTTP、DNS、RPC 等服务，默认是127.0.0.1,不对外提供服务，如果需要则改成 0.0.0.0</li>
+<li>-join：加入一个已经启动的 agent 的 ip 地址，可以指定多个</li>
+<li>-retry-join：允许你在第一次失败后进行尝试</li>
+<li>-retry-interval：两次 join 之间的时间间隔，默认是30s</li>
+<li>-retry-max：尝试重复 join 的次数，默认是0，即无限次尝试</li>
+<li>-log-level：日志信息级别，默认是info，还可以选择：trace、debug、info、warn、err</li>
+</ul>
+<h2 id="Q-amp-A"><a href="#Q-amp-A" class="headerlink" title="Q&amp;A"></a>Q&amp;A</h2><ol>
+<li>no leader error<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">原因：</span><br><span class="line">    出现此问题是由于consul leader选举失效产生的。</span><br><span class="line">    consul采用raft选举协议，由于consul并没有很好的自适应策略，导致其严格按照启动参数中的配置来进行预期选举。若期望节点数与集群实际节点数不符，节点将持续选择自身作为集群leader，而不是采用随机算发中的比值选举。</span><br><span class="line">解决方法：</span><br><span class="line">    1.重启consul，修改启动参数中bootstrap-expect的数值。</span><br><span class="line">    2.强制使用raft peers.json指定leader，不同版本json格式不同，node_id文件若丢失则重启重新生成。后续维护不便。</span><br><span class="line">    3.使用operator命令强制处理节点</span><br></pre></td></tr></table></figure></li>
+<li>集群方案kv获取稳定性保障<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">由于consul提供的调用包/api实现的是单节点信息获取。因此当使用的节点down时，将不能稳定发挥集群效用。</span><br><span class="line">对于仅使用kv的调用来说，可以考虑在上层增加load balance，同时集群内至少保证有两个及以上service节点。分别为不同节点设置不同的预期节点数。在某一client端down后仍旧可以短期内提供服务，等待restart。</span><br></pre></td></tr></table></figure></li>
+</ol>
 ]]></content>
   </entry>
   <entry>
-    <title>监控架构思考</title>
-    <url>/2023/07/08/%E7%9B%91%E6%8E%A7%E6%9E%B6%E6%9E%84%E6%80%9D%E8%80%83/</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title>consul cluster</title>
-    <url>/2023/07/05/consul-cluster/</url>
-    <content><![CDATA[<h1 id="consul"><a href="#consul" class="headerlink" title="consul"></a>consul</h1><h2 id="consul-agent-register-service"><a href="#consul-agent-register-service" class="headerlink" title="consul agent register service"></a>consul agent register service</h2><p><a href="https://developer.hashicorp.com/consul/commands/services">https://developer.hashicorp.com/consul/commands/services</a></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Warning for Consul operators: The Consul agent persists registered services in the local state directory. If this state directory is deleted or lost, services registered with this command will need to be reregistered.</span><br></pre></td></tr></table></figure>
-<h2 id="why-consul-did’t-sync-svc-data"><a href="#why-consul-did’t-sync-svc-data" class="headerlink" title="why consul did’t sync svc data"></a>why consul did’t sync svc data</h2><p><a href="https://github.com/hashicorp/consul/issues/11438">https://github.com/hashicorp/consul/issues/11438</a></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">For example, say you have nodes 1 and 2 in your environment, and two services�Cservice A and service B. Service A is deployed on both nodes 1 and 2, and separately registered with each node.</span><br><span class="line"></span><br><span class="line">Service B issues a service discovery query to Consul for service A, and Consul returns the IP/port info of the service running on both node 1 and 2.</span><br><span class="line"></span><br><span class="line">If node 1 goes down, the health check for service instance A on that machine will be marked as failed. As such, Consul&#x27;s catalog will no longer return information for the instance of service A running on node 1. It will only return information about the remaining healthy instance that is registered and still running on node 2.</span><br><span class="line"></span><br><span class="line">In order to have a service be highly available, you need to run the service across multiple nodes, and ensure the service is properly registered with its local node so that the particular service instance is discoverable in the service catalog.</span><br><span class="line"></span><br><span class="line">See Introduction to HashiCorp Consul for a visual explanation of this�Cstarting at the 5min mark through 6:25.</span><br></pre></td></tr></table></figure>
-<p><a href="https://www.youtube.com/watch?v=mxeMdl0KvBI&t=302s">https://www.youtube.com/watch?v=mxeMdl0KvBI&amp;t=302s</a></p>
-<h2 id="how-to-use-consul-cluster"><a href="#how-to-use-consul-cluster" class="headerlink" title="how to use consul cluster"></a>how to use consul cluster</h2><p><a href="https://www.cnblogs.com/bluersw/p/11610711.html">https://www.cnblogs.com/bluersw/p/11610711.html</a><br>server test<br><img src="/2023/07/05/consul-cluster/server_test.gif"><br>client test<br><img src="/2023/07/05/consul-cluster/client_test.gif"></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>work_schedule</title>
-    <url>/2023/05/30/work-schedule/</url>
-    <content><![CDATA[<p><img src="/2023/05/30/work-schedule/work_schedule.png"></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>cpu mode</title>
-    <url>/2023/05/29/cpu-mode/</url>
-    <content><![CDATA[<p>时常忘记，记录</p>
+    <title>前辈出的golang面试题</title>
+    <url>/2022/04/13/%E6%9F%90500%E5%85%AC%E5%8F%B8golang%E9%9D%A2%E8%AF%95%E9%A2%98/</url>
+    <content><![CDATA[<p>面试内容由浅入深，值得参考</p>
 <span id="more"></span>
-<table>
-<thead>
-<tr>
-<th>名称</th>
-<th>表达的内容</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>user</td>
-<td>从系统启动开始累计到当前时刻，用户态的CPU时间，不包含nice值为负进程</td>
-</tr>
-<tr>
-<td>nice</td>
-<td>从系统启动开始累计到当前时刻，nice值为负的进程所占用的CPU时间</td>
-</tr>
-<tr>
-<td>system</td>
-<td>从系统启动开始累计当前时刻，核心时间</td>
-</tr>
-<tr>
-<td>idle</td>
-<td>从系统启动开始累计到当前时刻，除IO等待时间以外其它等待时间</td>
-</tr>
-<tr>
-<td>iowait</td>
-<td>从系统启动开始累计到当前时刻，IO等待时间</td>
-</tr>
-<tr>
-<td>irq</td>
-<td>从系统启动开始累计到当前时刻，硬中断时间</td>
-</tr>
-<tr>
-<td>softirq</td>
-<td>从系统启动开始累计到当前时刻，软中断时间</td>
-</tr>
-<tr>
-<td>stealstolen</td>
-<td>当一台物理机有多个虚拟机时，该cpu在其他虚拟机运行的时间</td>
-</tr>
-<tr>
-<td>guest</td>
-<td>在cpu内核控制下，提供给在上面运行虚拟机占用的cpu时间</td>
-</tr>
-</tbody></table>
-]]></content>
-      <tags>
-        <tag>monitor</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>promxy config</title>
-    <url>/2023/05/23/promxy-config/</url>
-    <content><![CDATA[<p>promxy<br>proxy prometheus endpoints as a single server to provide api services<br>use docker hub’s pubilc image<br>github repo : <a href="https://github.com/jacksontj/promxy">https://github.com/jacksontj/promxy</a></p>
-<span id="more"></span>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">global:</span></span><br><span class="line">  <span class="attr">evaluation_interval:</span> <span class="string">60s</span></span><br><span class="line">  <span class="attr">scrape_interval:</span> <span class="string">60s</span></span><br><span class="line">  <span class="attr">scrape_timeout:</span> <span class="string">20s</span></span><br><span class="line">  <span class="attr">external_labels:</span></span><br><span class="line">    <span class="attr">source:</span> <span class="string">basic_monitor</span></span><br><span class="line"><span class="attr">promxy:</span></span><br><span class="line">  <span class="attr">server_groups:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">static_configs:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">targets:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">xx.xxx.xxx.xxx:9090</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">promxy_source:</span> <span class="string">BJ</span></span><br><span class="line">      <span class="attr">anti_affinity:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">5s</span></span><br><span class="line">      <span class="attr">remote_read:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">remote_read_path:</span> <span class="string">api/v1/read</span></span><br><span class="line">      <span class="attr">query_params:</span></span><br><span class="line">        <span class="attr">nocache:</span> <span class="number">1</span></span><br><span class="line">      <span class="attr">scheme:</span> <span class="string">http</span></span><br><span class="line">      <span class="attr">http_client:</span></span><br><span class="line">        <span class="attr">dial_timeout:</span> <span class="string">1s</span></span><br><span class="line">        <span class="attr">tls_config:</span></span><br><span class="line">          <span class="attr">insecure_skip_verify:</span> <span class="literal">true</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">static_configs:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">targets:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">xx.xxx.xxx.xxx:9090</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">promxy_source:</span> <span class="string">QD</span></span><br><span class="line">      <span class="attr">anti_affinity:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">5s</span></span><br><span class="line">      <span class="attr">remote_read:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">remote_read_path:</span> <span class="string">api/v1/read</span></span><br><span class="line">      <span class="attr">query_params:</span></span><br><span class="line">        <span class="attr">nocache:</span> <span class="number">1</span></span><br><span class="line">      <span class="attr">scheme:</span> <span class="string">http</span></span><br><span class="line">      <span class="attr">http_client:</span></span><br><span class="line">        <span class="attr">dial_timeout:</span> <span class="string">1s</span></span><br><span class="line">        <span class="attr">tls_config:</span></span><br><span class="line">          <span class="attr">insecure_skip_verify:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>]]></content>
-  </entry>
-  <entry>
-    <title>istio架构图</title>
-    <url>/2023/05/22/istio%E6%9E%B6%E6%9E%84%E5%9B%BE/</url>
-    <content><![CDATA[<p><img src="/2023/05/22/istio%E6%9E%B6%E6%9E%84%E5%9B%BE/arch.svg"></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>ansible 服务器 exporter playbook</title>
-    <url>/2023/05/19/ansible-%E6%9C%8D%E5%8A%A1%E5%99%A8-exporter-playbook/</url>
-    <content><![CDATA[<p>just playbook yaml, no more</p>
-<span id="more"></span>
-<p>Node exporter<br>playbooks</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Install</span> <span class="string">and</span> <span class="string">configure</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">all</span></span><br><span class="line">  <span class="attr">become:</span> <span class="literal">yes</span></span><br><span class="line">  <span class="attr">gather_facts:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">vars:</span></span><br><span class="line">    <span class="attr">node_exporter_version:</span> <span class="string">&quot;1.5.0&quot;</span></span><br><span class="line">    <span class="attr">node_exporter_download_url:</span> <span class="string">&quot;https://github.com/prometheus/node_exporter/releases/download/v<span class="template-variable">&#123;&#123; node_exporter_version &#125;&#125;</span>/node_exporter-<span class="template-variable">&#123;&#123; node_exporter_version &#125;&#125;</span>.<span class="template-variable">&#123;&#123; ansible_system | lower &#125;&#125;</span>-amd64.tar.gz&quot;</span></span><br><span class="line">    <span class="attr">node_exporter_install_dir:</span> <span class="string">&quot;/opt/node_exporter&quot;</span></span><br><span class="line">    <span class="attr">node_exporter_config_file:</span> <span class="string">&quot;/etc/node_exporter/node_exporter.yml&quot;</span></span><br><span class="line">    <span class="attr">node_exporter_scrape_interval:</span> <span class="string">&quot;30s&quot;</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">     <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">create</span> <span class="string">exporter</span> <span class="string">group</span></span><br><span class="line">        <span class="attr">group:</span> <span class="string">name=exporter</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">create</span> <span class="string">node_exporter</span> <span class="string">user</span></span><br><span class="line">      <span class="attr">user:</span></span><br><span class="line">          <span class="string">name=node_exporter</span></span><br><span class="line">          <span class="string">comment=&quot;prometheus</span> <span class="string">node_exporter</span> <span class="string">user&quot;</span></span><br><span class="line">          <span class="string">group=exporter</span></span><br><span class="line">          <span class="string">shell=/sbin/nologin</span></span><br><span class="line">          <span class="string">createhome=no</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Download</span> <span class="string">and</span> <span class="string">extract</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">get_url:</span></span><br><span class="line">        <span class="attr">url:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; node_exporter_download_url &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;/tmp/node_exporter.tar.gz&quot;</span></span><br><span class="line">      <span class="attr">register:</span> <span class="string">node_exporter_download</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Extract</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">unarchive:</span></span><br><span class="line">        <span class="attr">src:</span> <span class="string">&quot;/tmp/node_exporter.tar.gz&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; node_exporter_install_dir &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">remote_src:</span> <span class="literal">yes</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">node_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Create</span> <span class="string">Node</span> <span class="string">Exporter</span> <span class="string">config</span> <span class="string">directory</span></span><br><span class="line">      <span class="attr">file:</span></span><br><span class="line">        <span class="attr">path:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; node_exporter_config_file | dirname &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">directory</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Configure</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">template:</span></span><br><span class="line">        <span class="attr">src:</span> <span class="string">&quot;templates/node_exporter.yml.j2&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; node_exporter_config_file &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">owner:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">group:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">mode:</span> <span class="number">0644</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">node_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Start</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">systemd:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">node_exporter</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">started</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">yes</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">node_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">handlers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Reload</span> <span class="string">systemd</span></span><br><span class="line">      <span class="attr">systemd:</span></span><br><span class="line">        <span class="attr">daemon_reload:</span> <span class="literal">yes</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Restart</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">systemd:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">node_exporter</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">restarted</span></span><br></pre></td></tr></table></figure>
-
-<p>node_exporter.yml.j2</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">global:</span></span><br><span class="line">  <span class="attr">scrape_interval:</span> &#123;&#123; <span class="string">node_exporter_scrape_interval</span> &#125;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">collectors:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">cpu</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">diskstats</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">filesystem</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">filefd</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">loadavg</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">stat</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">time</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">vmstat</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">tcpstat</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">meminfo</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">netstat</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">uname</span></span><br></pre></td></tr></table></figure>
-<p>wmi exporter</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Install</span> <span class="string">and</span> <span class="string">configure</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">windows_servers</span></span><br><span class="line">  <span class="attr">gather_facts:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">vars:</span></span><br><span class="line">    <span class="attr">wmi_exporter_version:</span> <span class="string">&quot;0.22.0&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_download_url:</span> <span class="string">&quot;https://github.com/martinlindhe/wmi_exporter/releases/download/v<span class="template-variable">&#123;&#123; wmi_exporter_version &#125;&#125;</span>/wmi_exporter-<span class="template-variable">&#123;&#123; wmi_exporter_version &#125;&#125;</span>.windows-amd64.zip&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_install_dir:</span> <span class="string">&quot;C:\\Program Files\\wmi_exporter&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_config_file:</span> <span class="string">&quot;C:\\Program Files\\wmi_exporter\\wmi_exporter.yml&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_scrape_interval:</span> <span class="string">&quot;30s&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_collectors:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">cpu</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">cpu_info</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">cs</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">memory</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">logical_disk</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">os</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">system</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">process</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">net</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">tcp</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="comment"># Download and extract WMI Exporter</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Download</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">win_get_url:</span></span><br><span class="line">        <span class="attr">url:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_download_url &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; playbook_dir &#125;&#125;</span>/wmi_exporter.zip&quot;</span></span><br><span class="line">      <span class="attr">register:</span> <span class="string">wmi_exporter_download</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Extract</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">win_unzip:</span></span><br><span class="line">        <span class="attr">src:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; playbook_dir &#125;&#125;</span>/wmi_exporter.zip&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_install_dir &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">wmi_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Configure WMI Exporter</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Configure</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">win_template:</span></span><br><span class="line">        <span class="attr">src:</span> <span class="string">templates/wmi_exporter.yml.j2</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_config_file &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">vars:</span></span><br><span class="line">        <span class="attr">wmi_exporter_scrape_interval:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_scrape_interval &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">wmi_exporter_collectors:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_collectors &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">wmi_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Start WMI Exporter service</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Start</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">win_service:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">wmi_exporter</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">started</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">yes</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">wmi_exporter_download.changed</span></span><br></pre></td></tr></table></figure>
-<p>wmi_exporter.yml.j2</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">global:</span></span><br><span class="line">  <span class="attr">scrape_interval:</span> &#123;&#123; <span class="string">wmi_exporter_scrape_interval</span> &#125;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">collectors:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">cpu</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">logical_disk</span></span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">if</span> <span class="string">&#x27;memory&#x27;</span> <span class="string">in</span> <span class="string">wmi_exporter_collectors</span> <span class="string">%</span>&#125;</span><br><span class="line">  <span class="bullet">-</span> <span class="string">memory</span></span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">endif</span> <span class="string">%</span>&#125;</span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">if</span> <span class="string">&#x27;net&#x27;</span> <span class="string">in</span> <span class="string">wmi_exporter_collectors</span> <span class="string">%</span>&#125;</span><br><span class="line">  <span class="bullet">-</span> <span class="string">net</span></span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">endif</span> <span class="string">%</span>&#125;</span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">if</span> <span class="string">&#x27;os&#x27;</span> <span class="string">in</span> <span class="string">wmi_exporter_collectors</span> <span class="string">%</span>&#125;</span><br><span class="line">  <span class="bullet">-</span> <span class="string">os</span></span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">endif</span> <span class="string">%</span>&#125;</span><br></pre></td></tr></table></figure>
-<p>all</p>
+<h2 id="语言基础"><a href="#语言基础" class="headerlink" title="语言基础"></a>语言基础</h2><ul>
+<li>语言分类(编译与解释)</li>
+<li>Go,C&#x2F;C++</li>
+<li>切片内存结构</li>
+<li>Map内存结构</li>
+<li>函数参数传递(值,指针)</li>
+<li>defer调用时机(调用顺序,return先后顺序,代码块等)</li>
+<li>函数绑定方式(区别)</li>
+<li>Go如何实现继承(多接口继承等)</li>
+<li>chan有缓冲,无缓冲</li>
+<li>select中default作用(读chan,写chan)</li>
+<li>Go中的闭包(需要注意什么)</li>
+</ul>
+<h3 id="高阶"><a href="#高阶" class="headerlink" title="高阶"></a>高阶</h3><ul>
+<li>go协程为什么性能高(真的高吗?相比Java高在什么地方)</li>
+<li>协程与线程的区别关系(真的比线程性能高吗?什么情况有优势,什么情况无优势)</li>
+<li>GC触发机制是什么</li>
+<li>协程调试机制是什么</li>
+<li>如何分析内存使用情况(定位内存泄露,死锁)</li>
+</ul>
+<h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><ul>
+<li>restful,rpc区别</li>
+<li>用过哪些go的网络框架</li>
+<li>restful常用的动作有哪些</li>
+<li>一个url绑定多个动作</li>
+<li>一个网络请求阻塞会影响其它的吗?</li>
+</ul>
+<h3 id="高阶-1"><a href="#高阶-1" class="headerlink" title="高阶"></a>高阶</h3><ul>
+<li>ip,tcp,http层级与关系</li>
+<li>tcp握手与断开大致流程<br><a href="https://zhuanlan.zhihu.com/p/26868716">https://zhuanlan.zhihu.com/p/26868716</a></li>
+<li>什么是tcp粘包(工作中是否遇到过,如何解决)</li>
+<li>工作中是否做过跨公网通信的项目(如何提高网络吞吐量)</li>
+</ul>
+<h2 id="数据库-Sql-NoSql"><a href="#数据库-Sql-NoSql" class="headerlink" title="数据库(Sql,NoSql)"></a>数据库(Sql,NoSql)</h2><ul>
+<li>mysql存储引擎有哪几种,各自的特点是什么?<br>show enginers<br><a href="https://zhuanlan.zhihu.com/p/50564425">https://zhuanlan.zhihu.com/p/50564425</a></li>
+<li>视图与表的关系(区别)</li>
+<li>关联查询有哪几种(区别)</li>
+<li>索引的分类(区别)<br><a href="https://blog.csdn.net/LuQiaoYa/article/details/111479990">https://blog.csdn.net/LuQiaoYa/article/details/111479990</a></li>
+<li>索引的匹配规则</li>
+<li>索引是否越多越好,为什么?</li>
+<li>是否使用过es或是某种no-sql存储系统?</li>
+<li>es的分片机制是什么(如果用过es)<br><a href="https://blog.csdn.net/baiyan3212/article/details/104339578">https://blog.csdn.net/baiyan3212/article/details/104339578</a></li>
+<li>es查询分类?(如果用过es)<br><a href="https://blog.csdn.net/shu616048151/article/details/102647313">https://blog.csdn.net/shu616048151/article/details/102647313</a></li>
+<li>es分词与全文检索区别(如果用过es)<br><a href="https://zhuanlan.zhihu.com/p/496868297">https://zhuanlan.zhihu.com/p/496868297</a></li>
+<li>redis为什么快?<br><a href="https://zhuanlan.zhihu.com/p/160157573">https://zhuanlan.zhihu.com/p/160157573</a></li>
+<li>工作中什么场景中用到过redis,怎么用的?</li>
+</ul>
+<h3 id="高阶-2"><a href="#高阶-2" class="headerlink" title="高阶"></a>高阶</h3><ul>
+<li>什么是二级索引(与一级索引的区别)<br><a href="https://blog.csdn.net/weixin_43606861/article/details/116202806">https://blog.csdn.net/weixin_43606861/article/details/116202806</a></li>
+<li>什么是回表如何避免回表<br><a href="https://www.zhihu.com/question/406402493">https://www.zhihu.com/question/406402493</a></li>
+<li>mysql中innodb索引的存储结构(为什么切换B-到B+)<br><a href="https://cloud.tencent.com/developer/article/1797121">https://cloud.tencent.com/developer/article/1797121</a></li>
+<li>redis的key驱逐策略有哪几种<br><a href="https://blog.csdn.net/l_mloveforever/article/details/111665927">https://blog.csdn.net/l_mloveforever/article/details/111665927</a></li>
+<li>redis的key驱逐时机</li>
+<li>redis是否具体的持久化的能力(分哪向种,区别)</li>
+</ul>
+<h2 id="消息中间件-Kafka"><a href="#消息中间件-Kafka" class="headerlink" title="消息中间件(Kafka)"></a>消息中间件(Kafka)</h2><ul>
+<li>是否使用过kafka</li>
+<li>kafka中consumer与group的关系</li>
+<li>服务如何保证不会重复消费消息</li>
+<li>生产者如何保证消息的一致性</li>
+</ul>
+<h3 id="高阶-3"><a href="#高阶-3" class="headerlink" title="高阶"></a>高阶</h3><ul>
+<li>什么是kafka扩(缩)容</li>
+<li>扩(缩)容时服务应该(可能)需要做什么工作</li>
+</ul>
+<h2 id="云原生"><a href="#云原生" class="headerlink" title="云原生"></a>云原生</h2><ul>
+<li><ul>
+<li>工作中是否使用docker</li>
+</ul>
+</li>
+<li><ul>
+<li>工作路是否使用某种k8s平台</li>
+</ul>
+</li>
+<li><ul>
+<li>IaaS,PaaS,SaaS是指什么,k8s属于哪一种</li>
+</ul>
+</li>
+</ul>
+<h3 id="高阶-4"><a href="#高阶-4" class="headerlink" title="高阶"></a>高阶</h3><ul>
+<li>是否了解k8s平台的关键组件及其主要功能</li>
+<li>什么是k8s的CRD,Operators(关系,区别)</li>
+<li>是否做过k8s的二次开发</li>
+<li>在k8s平台运行的服务出错(崩溃,死锁,内存泄露)如何解决</li>
+<li>是否了解或是使用过serverless平台</li>
+</ul>
+<h2 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h2><ul>
+<li>随机选择一些简单的算法</li>
+</ul>
+<h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><ul>
+<li>是否了解或是使用过大数据平台</li>
+<li>hadoop与spark关系(区别)</li>
+<li>是否了解或是使用过flink</li>
+<li>是否使用过或了解prometheus监控系统</li>
+<li>是否分析过工作工作中使用过开源系统的源码?</li>
+<li>是否参与过某个开源项目(github地址)</li>
+</ul>
 ]]></content>
   </entry>
   <entry>
@@ -225,189 +257,152 @@
 ]]></content>
   </entry>
   <entry>
-    <title>记一次consul迁移</title>
-    <url>/2023/04/04/consul%E8%BF%81%E7%A7%BB/</url>
-    <content><![CDATA[<p>原consul集群迁移，需完整还原历史数据的同时更换ip，并升级consul版本。</p>
+    <title>ansible 服务器 exporter playbook</title>
+    <url>/2023/05/19/ansible-%E6%9C%8D%E5%8A%A1%E5%99%A8-exporter-playbook/</url>
+    <content><![CDATA[<p>just playbook yaml, no more</p>
 <span id="more"></span>
-<h2 id="consul架构"><a href="#consul架构" class="headerlink" title="consul架构"></a>consul架构</h2><p><img src="/2023/04/04/consul%E8%BF%81%E7%A7%BB/assets.jpg"></p>
-<h2 id="background"><a href="#background" class="headerlink" title="background"></a>background</h2><ul>
-<li>原机房弃用</li>
-<li>原consul使用单一dc，三节点集群</li>
-<li>三节点分别提供注册svc服务</li>
-<li>原consul版本过低，0.7</li>
-<li>使用最新版consul重新部署</li>
-<li>此集群使用过久，其中服务注册和kv存储都不能丢弃。</li>
-<li>prometheus、k8s集群及某些后端服务依赖于此consul集群</li>
-<li>consul-template依赖，同步部分配置config</li>
-<li>完整迁移历史数据</li>
-</ul>
-<h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><ol>
-<li>保留所有kv及各自节点的service注册信息</li>
-<li>升级版本至1.11.1,防止误触删除kv信息等</li>
-<li>集群化建设，提供相对稳定服务</li>
-</ol>
-<h2 id="方案分析"><a href="#方案分析" class="headerlink" title="方案分析"></a>方案分析</h2><ol>
-<li>使用snapshot方式可以快照复制完整信息，但遗憾的是host_id与raft信息同样会保留。由于原集群全部节点均下线，所以无法使用此方式。</li>
-<li>升级consul版本，新旧版本存在数据压缩及存储方式的不同，因此无法在一个集群内使用版本跨度过大的两个实例。</li>
-<li>查阅官网及官方git了解到，1.11.1版本在启动时会重新处理旧数据，使其成为新版本可使用的文件规则。</li>
-<li>综上所述，最终考虑使用手动复制迁移service与kv（同集群仅有kv存在数据一致性）</li>
-</ol>
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
-<li>scp原节点service到新服务器文件路径内，service路径位于 &#x2F;data&#x2F;services</li>
-<li>于新服务器内安装docker（restart always），使用consul镜像，mount本地路径（数据持久化）</li>
-<li>将原&#x2F;service数据导入挂载的&#x2F;data目录下</li>
-<li>docker 启动新节点（此时会发现service内数据已更新为新规则文件）<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker run --net host --name consul -v /data/consul/data:/consul/data 76802375bc5c agent -server=<span class="literal">true</span> -client=0.0.0.0 -ui --bootstrap-expect=1 -datacenter=srv -data-dir=/consul/data  -node xx.xxx.xx.xxx -<span class="built_in">bind</span> xx.xxx.xx.xxx </span><br></pre></td></tr></table></figure></li>
-<li>使用consul operator api 同步kv （无token则省略token）<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"> <span class="comment"># 导出所有kv键值对，注意最后参数&#x27;&#x27;是导出键值对的前缀，为空字符串导出所有</span></span><br><span class="line">consul kv <span class="built_in">export</span> --http-addr=http://xxx.xxx.xxx.xxx:8500  <span class="string">&#x27;&#x27;</span> &gt; /consul/backup/consul_kv.json</span><br><span class="line"></span><br><span class="line"><span class="comment"># 导入</span></span><br><span class="line">consul kv import --http-addr=http://xxx.xxx.xxx.xxx:8500 -token=b3a9bca3-6e8e-9678-ea35-ccb8fb272d42 @consul_kv.json</span><br></pre></td></tr></table></figure></li>
-<li>同方案启动另外两个节点，启动参数中使用join 加入最新master节点,–bootstrap-expect参数需要特别注意，此参数为预期节点数量，只有实际节点数与预期节点数相同时，该节点才会正常启用leader选举，否则会no leader</li>
-</ol>
-<h2 id="Required-Ports-v1-15-x-latest"><a href="#Required-Ports-v1-15-x-latest" class="headerlink" title="Required Ports v1.15.x (latest)"></a>Required Ports v1.15.x (latest)</h2><ul>
-<li>DNS: The DNS server (TCP and UDP)                         8600</li>
-<li>HTTP: The HTTP API (TCP Only)                             8500</li>
-<li>LAN Serf: The Serf LAN port (TCP and UDP)                 8301</li>
-<li>Wan Serf: The Serf WAN port (TCP and UDP)                 8302</li>
-<li>server: Server RPC address (TCP Only)                     8300</li>
-<li>Sidecar Proxy Min: Inclusive min port number to use for automatically assigned sidecar service registrations. 21000</li>
-<li>Sidecar Proxy Max: Inclusive max port number to use for automatically assigned sidecar service registrations. 21255</li>
-</ul>
-<h2 id="scp命令"><a href="#scp命令" class="headerlink" title="scp命令"></a>scp命令</h2><h3 id="本地-发送至-远程"><a href="#本地-发送至-远程" class="headerlink" title="本地 发送至 远程"></a>本地 发送至 远程</h3><ol>
-<li>复制单个文件<br>scp 本地文件路径 远程用户名@ip地址:远程路径<br>scp .&#x2F;test.txt <a href="mailto:&#x72;&#x6f;&#111;&#116;&#64;&#x30;&#46;&#x30;&#x2e;&#48;&#46;&#48;">&#x72;&#x6f;&#111;&#116;&#64;&#x30;&#46;&#x30;&#x2e;&#48;&#46;&#48;</a>:&#x2F;home&#x2F;me</li>
-<li>复制文件夹<br>scp -r 本地文件夹路径 远程用户名@ip地址:远程路径</li>
-</ol>
-<h3 id="远程-拷贝至-本地"><a href="#远程-拷贝至-本地" class="headerlink" title="远程 拷贝至 本地"></a>远程 拷贝至 本地</h3><ol>
-<li>复制单个文件<br>scp 远程用户名@ip地址:远程路径 本地文件路径</li>
-<li>复制文件夹<br>scp -r 远程用户名@ip地址:远程路径 本地文件夹路径</li>
-</ol>
-<h2 id="consul-启动参数"><a href="#consul-启动参数" class="headerlink" title="consul 启动参数"></a>consul 启动参数</h2><ul>
-<li>-server：以 server 模式启动代理</li>
-<li>-data-dir： 配置 consul 数据存储路径</li>
-</ul>
-<p>##bootstrap-expect 未设置的情况会导致consul无法完成选举，各存活节点选举自身。全部节点需设置相同节点数，且实际数量要与期望节点数目一制</p>
-<ul>
-<li>-bootstrap-expect：期望的 server 节点数目，consul 一直等到指定sever数目的时候才会引导整个集群</li>
-<li>-bind：绑定的 IP 地址，默认是 0.0.0.0</li>
-<li>-node：节点在集群中的名称，在一个集群中必须是唯一的，默认是该节点的主机名</li>
-<li>-ui： 开启 web 管理界面</li>
-<li>-config-dir：配置文件目录，所有以 .json 结尾的文件都会被加载，可以是服务或 Consul 自身的配置</li>
-<li>-client：提供 HTTP、DNS、RPC 等服务，默认是127.0.0.1,不对外提供服务，如果需要则改成 0.0.0.0</li>
-<li>-join：加入一个已经启动的 agent 的 ip 地址，可以指定多个</li>
-<li>-retry-join：允许你在第一次失败后进行尝试</li>
-<li>-retry-interval：两次 join 之间的时间间隔，默认是30s</li>
-<li>-retry-max：尝试重复 join 的次数，默认是0，即无限次尝试</li>
-<li>-log-level：日志信息级别，默认是info，还可以选择：trace、debug、info、warn、err</li>
-</ul>
-<h2 id="Q-amp-A"><a href="#Q-amp-A" class="headerlink" title="Q&amp;A"></a>Q&amp;A</h2><ol>
-<li>no leader error<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">原因：</span><br><span class="line">    出现此问题是由于consul leader选举失效产生的。</span><br><span class="line">    consul采用raft选举协议，由于consul并没有很好的自适应策略，导致其严格按照启动参数中的配置来进行预期选举。若期望节点数与集群实际节点数不符，节点将持续选择自身作为集群leader，而不是采用随机算发中的比值选举。</span><br><span class="line">解决方法：</span><br><span class="line">    1.重启consul，修改启动参数中bootstrap-expect的数值。</span><br><span class="line">    2.强制使用raft peers.json指定leader，不同版本json格式不同，node_id文件若丢失则重启重新生成。后续维护不便。</span><br><span class="line">    3.使用operator命令强制处理节点</span><br></pre></td></tr></table></figure></li>
-<li>集群方案kv获取稳定性保障<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">由于consul提供的调用包/api实现的是单节点信息获取。因此当使用的节点down时，将不能稳定发挥集群效用。</span><br><span class="line">对于仅使用kv的调用来说，可以考虑在上层增加load balance，同时集群内至少保证有两个及以上service节点。分别为不同节点设置不同的预期节点数。在某一client端down后仍旧可以短期内提供服务，等待restart。</span><br></pre></td></tr></table></figure></li>
-</ol>
+<p>Node exporter<br>playbooks</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Install</span> <span class="string">and</span> <span class="string">configure</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">all</span></span><br><span class="line">  <span class="attr">become:</span> <span class="literal">yes</span></span><br><span class="line">  <span class="attr">gather_facts:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">vars:</span></span><br><span class="line">    <span class="attr">node_exporter_version:</span> <span class="string">&quot;1.5.0&quot;</span></span><br><span class="line">    <span class="attr">node_exporter_download_url:</span> <span class="string">&quot;https://github.com/prometheus/node_exporter/releases/download/v<span class="template-variable">&#123;&#123; node_exporter_version &#125;&#125;</span>/node_exporter-<span class="template-variable">&#123;&#123; node_exporter_version &#125;&#125;</span>.<span class="template-variable">&#123;&#123; ansible_system | lower &#125;&#125;</span>-amd64.tar.gz&quot;</span></span><br><span class="line">    <span class="attr">node_exporter_install_dir:</span> <span class="string">&quot;/opt/node_exporter&quot;</span></span><br><span class="line">    <span class="attr">node_exporter_config_file:</span> <span class="string">&quot;/etc/node_exporter/node_exporter.yml&quot;</span></span><br><span class="line">    <span class="attr">node_exporter_scrape_interval:</span> <span class="string">&quot;30s&quot;</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">     <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">create</span> <span class="string">exporter</span> <span class="string">group</span></span><br><span class="line">        <span class="attr">group:</span> <span class="string">name=exporter</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">create</span> <span class="string">node_exporter</span> <span class="string">user</span></span><br><span class="line">      <span class="attr">user:</span></span><br><span class="line">          <span class="string">name=node_exporter</span></span><br><span class="line">          <span class="string">comment=&quot;prometheus</span> <span class="string">node_exporter</span> <span class="string">user&quot;</span></span><br><span class="line">          <span class="string">group=exporter</span></span><br><span class="line">          <span class="string">shell=/sbin/nologin</span></span><br><span class="line">          <span class="string">createhome=no</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Download</span> <span class="string">and</span> <span class="string">extract</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">get_url:</span></span><br><span class="line">        <span class="attr">url:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; node_exporter_download_url &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;/tmp/node_exporter.tar.gz&quot;</span></span><br><span class="line">      <span class="attr">register:</span> <span class="string">node_exporter_download</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Extract</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">unarchive:</span></span><br><span class="line">        <span class="attr">src:</span> <span class="string">&quot;/tmp/node_exporter.tar.gz&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; node_exporter_install_dir &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">remote_src:</span> <span class="literal">yes</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">node_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Create</span> <span class="string">Node</span> <span class="string">Exporter</span> <span class="string">config</span> <span class="string">directory</span></span><br><span class="line">      <span class="attr">file:</span></span><br><span class="line">        <span class="attr">path:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; node_exporter_config_file | dirname &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">directory</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Configure</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">template:</span></span><br><span class="line">        <span class="attr">src:</span> <span class="string">&quot;templates/node_exporter.yml.j2&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; node_exporter_config_file &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">owner:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">group:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">mode:</span> <span class="number">0644</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">node_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Start</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">systemd:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">node_exporter</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">started</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">yes</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">node_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">handlers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Reload</span> <span class="string">systemd</span></span><br><span class="line">      <span class="attr">systemd:</span></span><br><span class="line">        <span class="attr">daemon_reload:</span> <span class="literal">yes</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Restart</span> <span class="string">Node</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">systemd:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">node_exporter</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">restarted</span></span><br></pre></td></tr></table></figure>
+
+<p>node_exporter.yml.j2</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">global:</span></span><br><span class="line">  <span class="attr">scrape_interval:</span> &#123;&#123; <span class="string">node_exporter_scrape_interval</span> &#125;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">collectors:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">cpu</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">diskstats</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">filesystem</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">filefd</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">loadavg</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">stat</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">time</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">vmstat</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">tcpstat</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">meminfo</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">netstat</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">uname</span></span><br></pre></td></tr></table></figure>
+<p>wmi exporter</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Install</span> <span class="string">and</span> <span class="string">configure</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">windows_servers</span></span><br><span class="line">  <span class="attr">gather_facts:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">vars:</span></span><br><span class="line">    <span class="attr">wmi_exporter_version:</span> <span class="string">&quot;0.22.0&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_download_url:</span> <span class="string">&quot;https://github.com/martinlindhe/wmi_exporter/releases/download/v<span class="template-variable">&#123;&#123; wmi_exporter_version &#125;&#125;</span>/wmi_exporter-<span class="template-variable">&#123;&#123; wmi_exporter_version &#125;&#125;</span>.windows-amd64.zip&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_install_dir:</span> <span class="string">&quot;C:\\Program Files\\wmi_exporter&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_config_file:</span> <span class="string">&quot;C:\\Program Files\\wmi_exporter\\wmi_exporter.yml&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_scrape_interval:</span> <span class="string">&quot;30s&quot;</span></span><br><span class="line">    <span class="attr">wmi_exporter_collectors:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">cpu</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">cpu_info</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">cs</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">memory</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">logical_disk</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">os</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">system</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">process</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">net</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">tcp</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">tasks:</span></span><br><span class="line">    <span class="comment"># Download and extract WMI Exporter</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Download</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">win_get_url:</span></span><br><span class="line">        <span class="attr">url:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_download_url &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; playbook_dir &#125;&#125;</span>/wmi_exporter.zip&quot;</span></span><br><span class="line">      <span class="attr">register:</span> <span class="string">wmi_exporter_download</span></span><br><span class="line"></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Extract</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">win_unzip:</span></span><br><span class="line">        <span class="attr">src:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; playbook_dir &#125;&#125;</span>/wmi_exporter.zip&quot;</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_install_dir &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">wmi_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Configure WMI Exporter</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Configure</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">win_template:</span></span><br><span class="line">        <span class="attr">src:</span> <span class="string">templates/wmi_exporter.yml.j2</span></span><br><span class="line">        <span class="attr">dest:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_config_file &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">vars:</span></span><br><span class="line">        <span class="attr">wmi_exporter_scrape_interval:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_scrape_interval &#125;&#125;</span>&quot;</span></span><br><span class="line">        <span class="attr">wmi_exporter_collectors:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; wmi_exporter_collectors &#125;&#125;</span>&quot;</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">wmi_exporter_download.changed</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Start WMI Exporter service</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Start</span> <span class="string">WMI</span> <span class="string">Exporter</span></span><br><span class="line">      <span class="attr">win_service:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">wmi_exporter</span></span><br><span class="line">        <span class="attr">state:</span> <span class="string">started</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">yes</span></span><br><span class="line">      <span class="attr">when:</span> <span class="string">wmi_exporter_download.changed</span></span><br></pre></td></tr></table></figure>
+<p>wmi_exporter.yml.j2</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">global:</span></span><br><span class="line">  <span class="attr">scrape_interval:</span> &#123;&#123; <span class="string">wmi_exporter_scrape_interval</span> &#125;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">collectors:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">cpu</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">logical_disk</span></span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">if</span> <span class="string">&#x27;memory&#x27;</span> <span class="string">in</span> <span class="string">wmi_exporter_collectors</span> <span class="string">%</span>&#125;</span><br><span class="line">  <span class="bullet">-</span> <span class="string">memory</span></span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">endif</span> <span class="string">%</span>&#125;</span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">if</span> <span class="string">&#x27;net&#x27;</span> <span class="string">in</span> <span class="string">wmi_exporter_collectors</span> <span class="string">%</span>&#125;</span><br><span class="line">  <span class="bullet">-</span> <span class="string">net</span></span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">endif</span> <span class="string">%</span>&#125;</span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">if</span> <span class="string">&#x27;os&#x27;</span> <span class="string">in</span> <span class="string">wmi_exporter_collectors</span> <span class="string">%</span>&#125;</span><br><span class="line">  <span class="bullet">-</span> <span class="string">os</span></span><br><span class="line">  &#123;<span class="string">%</span> <span class="string">endif</span> <span class="string">%</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>all</p>
 ]]></content>
   </entry>
   <entry>
-    <title>四小时睡眠后的一天</title>
-    <url>/2023/03/29/%E5%9B%9B%E5%B0%8F%E6%97%B6%E7%9D%A1%E7%9C%A0%E5%90%8E%E7%9A%84%E4%B8%80%E5%A4%A9/</url>
-    <content><![CDATA[<h2 id="除了困还是困"><a href="#除了困还是困" class="headerlink" title="除了困还是困"></a>除了困还是困</h2>]]></content>
+    <title>istio架构图</title>
+    <url>/2023/05/22/istio%E6%9E%B6%E6%9E%84%E5%9B%BE/</url>
+    <content><![CDATA[<p><img src="/2023/05/22/istio%E6%9E%B6%E6%9E%84%E5%9B%BE/arch.svg"></p>
+]]></content>
   </entry>
   <entry>
-    <title>某500公司golang面试题</title>
-    <url>/2022/04/13/%E6%9F%90500%E5%85%AC%E5%8F%B8golang%E9%9D%A2%E8%AF%95%E9%A2%98/</url>
-    <content><![CDATA[<p>面试内容由浅入深，值得参考</p>
+    <title>promxy config</title>
+    <url>/2023/05/23/promxy-config/</url>
+    <content><![CDATA[<p>promxy<br>proxy prometheus endpoints as a single server to provide api services<br>use docker hub’s pubilc image<br>github repo : <a href="https://github.com/jacksontj/promxy">https://github.com/jacksontj/promxy</a></p>
 <span id="more"></span>
-<h2 id="语言基础"><a href="#语言基础" class="headerlink" title="语言基础"></a>语言基础</h2><ul>
-<li>语言分类(编译与解释)</li>
-<li>Go,C&#x2F;C++</li>
-<li>切片内存结构</li>
-<li>Map内存结构</li>
-<li>函数参数传递(值,指针)</li>
-<li>defer调用时机(调用顺序,return先后顺序,代码块等)</li>
-<li>函数绑定方式(区别)</li>
-<li>Go如何实现继承(多接口继承等)</li>
-<li>chan有缓冲,无缓冲</li>
-<li>select中default作用(读chan,写chan)</li>
-<li>Go中的闭包(需要注意什么)</li>
-</ul>
-<h3 id="高阶"><a href="#高阶" class="headerlink" title="高阶"></a>高阶</h3><ul>
-<li>go协程为什么性能高(真的高吗?相比Java高在什么地方)</li>
-<li>协程与线程的区别关系(真的比线程性能高吗?什么情况有优势,什么情况无优势)</li>
-<li>GC触发机制是什么</li>
-<li>协程调试机制是什么</li>
-<li>如何分析内存使用情况(定位内存泄露,死锁)</li>
-</ul>
-<h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><ul>
-<li>restful,rpc区别</li>
-<li>用过哪些go的网络框架</li>
-<li>restful常用的动作有哪些</li>
-<li>一个url绑定多个动作</li>
-<li>一个网络请求阻塞会影响其它的吗?</li>
-</ul>
-<h3 id="高阶-1"><a href="#高阶-1" class="headerlink" title="高阶"></a>高阶</h3><ul>
-<li>ip,tcp,http层级与关系</li>
-<li>tcp握手与断开大致流程</li>
-<li>什么是tcp粘包(工作中是否遇到过,如何解决)</li>
-<li>工作中是否做过跨公网通信的项目(如何提高网络吞吐量)</li>
-</ul>
-<h2 id="数据库-Sql-NoSql"><a href="#数据库-Sql-NoSql" class="headerlink" title="数据库(Sql,NoSql)"></a>数据库(Sql,NoSql)</h2><ul>
-<li>mysql存储引擎有哪几种,各自的特点是什么?</li>
-<li>视图与表的关系(区别)</li>
-<li>关联查询有哪几种(区别)</li>
-<li>索引的分类(区别)</li>
-<li>索引的匹配规则</li>
-<li>索引是否越多越好,为什么?</li>
-<li>是否使用过es或是某种no-sql存储系统?</li>
-<li>es的分片机制是什么(如果用过es)</li>
-<li>es查询分类?(如果用过es)</li>
-<li>es分词与全文检索区别(如果用过es)</li>
-<li>redis为什么快?</li>
-<li>工作中什么场景中用到过redis,怎么用的?</li>
-</ul>
-<h3 id="高阶-2"><a href="#高阶-2" class="headerlink" title="高阶"></a>高阶</h3><ul>
-<li>什么是二级索引(与一级索引的区别)</li>
-<li>什么是回表如何避免回表</li>
-<li>mysql中innodb索引的存储结构(为什么切换B-到B+)</li>
-<li>redis的key驱逐策略有哪几种</li>
-<li>redis的key驱逐时机</li>
-<li>redis是否具体的持久化的能力(分哪向种,区别)</li>
-</ul>
-<h2 id="消息中间件-Kafka"><a href="#消息中间件-Kafka" class="headerlink" title="消息中间件(Kafka)"></a>消息中间件(Kafka)</h2><ul>
-<li>是否使用过kafka</li>
-<li>kafka中consumer与group的关系</li>
-<li>服务如何保证不会重复消费消息</li>
-<li>生产者如何保证消息的一致性</li>
-</ul>
-<h3 id="高阶-3"><a href="#高阶-3" class="headerlink" title="高阶"></a>高阶</h3><ul>
-<li>什么是kafka扩(缩)容</li>
-<li>扩(缩)容时服务应该(可能)需要做什么工作</li>
-</ul>
-<h2 id="云原生"><a href="#云原生" class="headerlink" title="云原生"></a>云原生</h2><ul>
-<li><ul>
-<li>工作中是否使用docker</li>
-</ul>
-</li>
-<li><ul>
-<li>工作路是否使用某种k8s平台</li>
-</ul>
-</li>
-<li><ul>
-<li>IaaS,PaaS,SaaS是指什么,k8s属于哪一种</li>
-</ul>
-</li>
-</ul>
-<h3 id="高阶-4"><a href="#高阶-4" class="headerlink" title="高阶"></a>高阶</h3><ul>
-<li>是否了解k8s平台的关键组件及其主要功能</li>
-<li>什么是k8s的CRD,Operators(关系,区别)</li>
-<li>是否做过k8s的二次开发</li>
-<li>在k8s平台运行的服务出错(崩溃,死锁,内存泄露)如何解决</li>
-<li>是否了解或是使用过serverless平台</li>
-</ul>
-<h2 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h2><ul>
-<li>随机选择一些简单的算法</li>
-</ul>
-<h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><ul>
-<li>是否了解或是使用过大数据平台</li>
-<li>hadoop与spark关系(区别)</li>
-<li>是否了解或是使用过flink</li>
-<li>是否使用过或了解prometheus监控系统</li>
-<li>是否分析过工作工作中使用过开源系统的源码?</li>
-<li>是否参与过某个开源项目(github地址)</li>
-</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">global:</span></span><br><span class="line">  <span class="attr">evaluation_interval:</span> <span class="string">60s</span></span><br><span class="line">  <span class="attr">scrape_interval:</span> <span class="string">60s</span></span><br><span class="line">  <span class="attr">scrape_timeout:</span> <span class="string">20s</span></span><br><span class="line">  <span class="attr">external_labels:</span></span><br><span class="line">    <span class="attr">source:</span> <span class="string">basic_monitor</span></span><br><span class="line"><span class="attr">promxy:</span></span><br><span class="line">  <span class="attr">server_groups:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">static_configs:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">targets:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">xx.xxx.xxx.xxx:9090</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">promxy_source:</span> <span class="string">BJ</span></span><br><span class="line">      <span class="attr">anti_affinity:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">5s</span></span><br><span class="line">      <span class="attr">remote_read:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">remote_read_path:</span> <span class="string">api/v1/read</span></span><br><span class="line">      <span class="attr">query_params:</span></span><br><span class="line">        <span class="attr">nocache:</span> <span class="number">1</span></span><br><span class="line">      <span class="attr">scheme:</span> <span class="string">http</span></span><br><span class="line">      <span class="attr">http_client:</span></span><br><span class="line">        <span class="attr">dial_timeout:</span> <span class="string">1s</span></span><br><span class="line">        <span class="attr">tls_config:</span></span><br><span class="line">          <span class="attr">insecure_skip_verify:</span> <span class="literal">true</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">static_configs:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">targets:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">xx.xxx.xxx.xxx:9090</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">promxy_source:</span> <span class="string">QD</span></span><br><span class="line">      <span class="attr">anti_affinity:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">5s</span></span><br><span class="line">      <span class="attr">remote_read:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">remote_read_path:</span> <span class="string">api/v1/read</span></span><br><span class="line">      <span class="attr">query_params:</span></span><br><span class="line">        <span class="attr">nocache:</span> <span class="number">1</span></span><br><span class="line">      <span class="attr">scheme:</span> <span class="string">http</span></span><br><span class="line">      <span class="attr">http_client:</span></span><br><span class="line">        <span class="attr">dial_timeout:</span> <span class="string">1s</span></span><br><span class="line">        <span class="attr">tls_config:</span></span><br><span class="line">          <span class="attr">insecure_skip_verify:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>]]></content>
+  </entry>
+  <entry>
+    <title>cpu mode</title>
+    <url>/2023/05/29/cpu-mode/</url>
+    <content><![CDATA[<p>时常忘记，记录</p>
+<span id="more"></span>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>表达的内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>user</td>
+<td>从系统启动开始累计到当前时刻，用户态的CPU时间，不包含nice值为负进程</td>
+</tr>
+<tr>
+<td>nice</td>
+<td>从系统启动开始累计到当前时刻，nice值为负的进程所占用的CPU时间</td>
+</tr>
+<tr>
+<td>system</td>
+<td>从系统启动开始累计当前时刻，核心时间</td>
+</tr>
+<tr>
+<td>idle</td>
+<td>从系统启动开始累计到当前时刻，除IO等待时间以外其它等待时间</td>
+</tr>
+<tr>
+<td>iowait</td>
+<td>从系统启动开始累计到当前时刻，IO等待时间</td>
+</tr>
+<tr>
+<td>irq</td>
+<td>从系统启动开始累计到当前时刻，硬中断时间</td>
+</tr>
+<tr>
+<td>softirq</td>
+<td>从系统启动开始累计到当前时刻，软中断时间</td>
+</tr>
+<tr>
+<td>stealstolen</td>
+<td>当一台物理机有多个虚拟机时，该cpu在其他虚拟机运行的时间</td>
+</tr>
+<tr>
+<td>guest</td>
+<td>在cpu内核控制下，提供给在上面运行虚拟机占用的cpu时间</td>
+</tr>
+</tbody></table>
 ]]></content>
+      <tags>
+        <tag>monitor</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>work_schedule</title>
+    <url>/2023/05/30/work-schedule/</url>
+    <content><![CDATA[<p><img src="/2023/05/30/work-schedule/work_schedule.png"></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>consul cluster</title>
+    <url>/2023/07/05/consul-cluster/</url>
+    <content><![CDATA[<h1 id="consul"><a href="#consul" class="headerlink" title="consul"></a>consul</h1><h2 id="consul-agent-register-service"><a href="#consul-agent-register-service" class="headerlink" title="consul agent register service"></a>consul agent register service</h2><p><a href="https://developer.hashicorp.com/consul/commands/services">https://developer.hashicorp.com/consul/commands/services</a></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Warning for Consul operators: The Consul agent persists registered services in the local state directory. If this state directory is deleted or lost, services registered with this command will need to be reregistered.</span><br></pre></td></tr></table></figure>
+<h2 id="why-consul-did’t-sync-svc-data"><a href="#why-consul-did’t-sync-svc-data" class="headerlink" title="why consul did’t sync svc data"></a>why consul did’t sync svc data</h2><p><a href="https://github.com/hashicorp/consul/issues/11438">https://github.com/hashicorp/consul/issues/11438</a></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">For example, say you have nodes 1 and 2 in your environment, and two services�Cservice A and service B. Service A is deployed on both nodes 1 and 2, and separately registered with each node.</span><br><span class="line"></span><br><span class="line">Service B issues a service discovery query to Consul for service A, and Consul returns the IP/port info of the service running on both node 1 and 2.</span><br><span class="line"></span><br><span class="line">If node 1 goes down, the health check for service instance A on that machine will be marked as failed. As such, Consul&#x27;s catalog will no longer return information for the instance of service A running on node 1. It will only return information about the remaining healthy instance that is registered and still running on node 2.</span><br><span class="line"></span><br><span class="line">In order to have a service be highly available, you need to run the service across multiple nodes, and ensure the service is properly registered with its local node so that the particular service instance is discoverable in the service catalog.</span><br><span class="line"></span><br><span class="line">See Introduction to HashiCorp Consul for a visual explanation of this�Cstarting at the 5min mark through 6:25.</span><br></pre></td></tr></table></figure>
+<p><a href="https://www.youtube.com/watch?v=mxeMdl0KvBI&t=302s">https://www.youtube.com/watch?v=mxeMdl0KvBI&amp;t=302s</a></p>
+<h2 id="how-to-use-consul-cluster"><a href="#how-to-use-consul-cluster" class="headerlink" title="how to use consul cluster"></a>how to use consul cluster</h2><p><a href="https://www.cnblogs.com/bluersw/p/11610711.html">https://www.cnblogs.com/bluersw/p/11610711.html</a><br>server test<br><img src="/2023/07/05/consul-cluster/server_test.gif"><br>client test<br><img src="/2023/07/05/consul-cluster/client_test.gif"></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>golang cache</title>
+    <url>/2023/08/14/golang-fastcache/</url>
+    <content><![CDATA[<p>cache 选型对比</p>
+<span id="more"></span>
+<h2 id="缓存的目的"><a href="#缓存的目的" class="headerlink" title="缓存的目的"></a>缓存的目的</h2><ol>
+<li>提高系统的读写能力</li>
+<li>单位时间内有时效性的数据快速响应</li>
+</ol>
+<h2 id="支持内容"><a href="#支持内容" class="headerlink" title="支持内容"></a>支持内容</h2><ol>
+<li>读取写入 </li>
+<li>淘汰策略</li>
+<li>过期时间</li>
+<li>GC问题</li>
+</ol>
+<h2 id="可选方案"><a href="#可选方案" class="headerlink" title="可选方案"></a>可选方案</h2><ol>
+<li><a href="https://github.com/coocood/freecache">freecache</a></li>
+<li><a href="https://github.com/allegro/bigcache">bigcache</a></li>
+<li><a href="https://github.com/VictoriaMetrics/fastcache">fastcache</a></li>
+<li><a href="https://github.com/glycerine/offheap">offheap</a></li>
+<li><a href="https://github.com/golang/groupcache">groupcache</a></li>
+<li><a href="https://github.com/dgraph-io/ristretto">ristretto</a></li>
+<li><a href="https://github.com/patrickmn/go-cache">go-cache</a></li>
+</ol>
+<h2 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h2><p><img src="/2023/08/14/golang-fastcache/cache%E5%AF%B9%E6%AF%94.jpg"></p>
+<h2 id="设计思路"><a href="#设计思路" class="headerlink" title="设计思路"></a>设计思路</h2><p>因长期占用内存空间，需要考虑GC对cache的影响<br>cache可以考虑使用堆外内存存储<br>避免使用指针类型<br>映射关系使用map[unit64]unit64存储<br>并发使用，可以给每个数据存储分片加读写锁<br>可在数据内维护过期时间，增加数据刷新逻辑</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>监控架构思考</title>
+    <url>/2023/07/08/%E7%9B%91%E6%8E%A7%E6%9E%B6%E6%9E%84%E6%80%9D%E8%80%83/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>golang type memory</title>
+    <url>/2023/08/17/golang-type-memory/</url>
+    <content><![CDATA[<h2 id="map"><a href="#map" class="headerlink" title="map"></a>map</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> hmap <span class="keyword">struct</span> &#123;</span><br><span class="line">   <span class="comment">// Note: the format of the hmap is also encoded in cmd/compile/internal/reflectdata/reflect.go.</span></span><br><span class="line">   <span class="comment">// Make sure this stays in sync with the compiler&#x27;s definition.</span></span><br><span class="line">   count     <span class="type">int</span> <span class="comment">// # live cells == size of map.  Must be first (used by len() builtin)</span></span><br><span class="line">   flags     <span class="type">uint8</span></span><br><span class="line">   B         <span class="type">uint8</span>  <span class="comment">// log_2 of # of buckets (can hold up to loadFactor * 2^B items)</span></span><br><span class="line">   noverflow <span class="type">uint16</span> <span class="comment">// approximate number of overflow buckets; see incrnoverflow for details</span></span><br><span class="line">   hash0     <span class="type">uint32</span> <span class="comment">// hash seed</span></span><br><span class="line"></span><br><span class="line">   buckets    unsafe.Pointer <span class="comment">// array of 2^B Buckets. may be nil if count==0.</span></span><br><span class="line">   oldbuckets unsafe.Pointer <span class="comment">// previous bucket array of half the size, non-nil only when growing</span></span><br><span class="line">   nevacuate  <span class="type">uintptr</span>        <span class="comment">// progress counter for evacuation (buckets less than this have been evacuated)</span></span><br><span class="line"></span><br><span class="line">   extra *mapextra <span class="comment">// optional fields</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// mapextra holds fields that are not present on all maps.</span></span><br><span class="line"><span class="keyword">type</span> mapextra <span class="keyword">struct</span> &#123;</span><br><span class="line">   <span class="comment">// If both key and elem do not contain pointers and are inline, then we mark bucket</span></span><br><span class="line">   <span class="comment">// type as containing no pointers. This avoids scanning such maps.</span></span><br><span class="line">   <span class="comment">// However, bmap.overflow is a pointer. In order to keep overflow buckets</span></span><br><span class="line">   <span class="comment">// alive, we store pointers to all overflow buckets in hmap.extra.overflow and hmap.extra.oldoverflow.</span></span><br><span class="line">   <span class="comment">// overflow and oldoverflow are only used if key and elem do not contain pointers.</span></span><br><span class="line">   <span class="comment">// overflow contains overflow buckets for hmap.buckets.</span></span><br><span class="line">   <span class="comment">// oldoverflow contains overflow buckets for hmap.oldbuckets.</span></span><br><span class="line">   <span class="comment">// The indirection allows to store a pointer to the slice in hiter.</span></span><br><span class="line">   overflow    *[]*bmap</span><br><span class="line">   oldoverflow *[]*bmap</span><br><span class="line"></span><br><span class="line">   <span class="comment">// nextOverflow holds a pointer to a free overflow bucket.</span></span><br><span class="line">   nextOverflow *bmap</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// A bucket for a Go map.</span></span><br><span class="line"><span class="keyword">type</span> bmap <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">// tophash generally contains the top byte of the hash value</span></span><br><span class="line">	<span class="comment">// for each key in this bucket. If tophash[0] &lt; minTopHash,</span></span><br><span class="line">	<span class="comment">// tophash[0] is a bucket evacuation state instead.</span></span><br><span class="line">	tophash [bucketCnt]<span class="type">uint8</span></span><br><span class="line">	<span class="comment">// Followed by bucketCnt keys and then bucketCnt elems.</span></span><br><span class="line">	<span class="comment">// <span class="doctag">NOTE:</span> packing all the keys together and then all the elems together makes the</span></span><br><span class="line">	<span class="comment">// code a bit more complicated than alternating key/elem/key/elem/... but it allows</span></span><br><span class="line">	<span class="comment">// us to eliminate padding which would be needed for, e.g., map[int64]int8.</span></span><br><span class="line">	<span class="comment">// Followed by an overflow pointer.</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="slice"><a href="#slice" class="headerlink" title="slice"></a>slice</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> slice <span class="keyword">struct</span> &#123;</span><br><span class="line">	array unsafe.Pointer</span><br><span class="line">	<span class="built_in">len</span>   <span class="type">int</span></span><br><span class="line">	<span class="built_in">cap</span>   <span class="type">int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
+    <title>Docker Mimir test remind</title>
+    <url>/2023/08/28/Docker-Mimir-test-remind/</url>
+    <content><![CDATA[<p>grafana new kv store,100% support prometheus,storage cluster,test cmd</p>
+<span id="more"></span>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">        --net host \</span><br><span class="line">        --name prometheus-test \</span><br><span class="line">        --restart always \</span><br><span class="line">        -u root \</span><br><span class="line">        --privileged=<span class="literal">true</span> \</span><br><span class="line">        -v E:\docker\prometheus:/data/prometheus \</span><br><span class="line">        -p 9090:9090 \</span><br><span class="line">        ubuntu/prometheus \</span><br><span class="line">        --config.file=/data/prometheus/prometheus.yml \</span><br><span class="line">        --storage.tsdb.path=/prometheus \</span><br><span class="line">        --storage.tsdb.retention.time=10d \</span><br><span class="line">        --web.enable-lifecycle \</span><br><span class="line">        --web.enable-admin-api</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">docker run \</span><br><span class="line">  --<span class="built_in">rm</span> \</span><br><span class="line">  --name mimir \</span><br><span class="line">  --publish 9009:9009 \</span><br><span class="line">  --volume E:\docker\mimir/demo.yaml:/etc/mimir/demo.yaml grafana/mimir:latest \</span><br><span class="line">  --config.file=/etc/mimir/demo.yaml</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">docker run -d  --network grafanet --name prometheus-test -u root -v e:\\docker\\prometheus:/data/prometheus -p 9090:9090 ubuntu/prometheus --config.file=/data/prometheus/conf/prometheus.yml --storage.tsdb.path=/prometheus  --storage.tsdb.retention.time=10d  --web.enable-lifecycle  --web.enable-admin-api</span><br><span class="line"></span><br><span class="line">docker run -d --<span class="built_in">rm</span> --network grafanet --name mimir --publish 9009:9009 --volume E:\docker\mimir/demo.yaml:/etc/mimir/demo.yaml grafana/mimir:latest --config.file=/etc/mimir/demo.yaml</span><br><span class="line"></span><br><span class="line">docker run -d --<span class="built_in">rm</span> --name=grafana --network=grafanet -p 3000:3000 grafana/grafana</span><br></pre></td></tr></table></figure>]]></content>
   </entry>
 </search>
